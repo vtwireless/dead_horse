@@ -1,0 +1,21 @@
+#!/bin/bash
+
+message="saving work"
+
+[ -n "$*" ] && message="$*"
+
+set -xe
+
+cd "$(dirname ${BASH_SOURCE[0]})"
+
+if [ "$(hostname)" = cornweb ] ; then
+    set +x
+    echo "do not run $0 on this machine: $(hostname)"
+    exit 1
+fi
+
+set +e
+
+git commit -a -m "$message"
+git push
+

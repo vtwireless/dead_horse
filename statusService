@@ -1,0 +1,124 @@
+#!/usr/bin/env node
+
+var Connection = require('ssh2');
+var totalNodes=36;
+var ipNumbersStartFrom=11;
+var IPsEnd=ipNumbersStartFrom+totalNodes;
+var results={};
+var Barrier = function (callback) {
+    var count = 0;
+    var reached = false;
+
+    this.add = function () {
+        if (reached)
+            throw new Error("attempting to expand already reached barrier");
+
+        count++;
+
+        return {
+            finish: function () {
+                count--;
+                if (count == 0) {
+                    reached = true;
+                    callback();
+                }
+            }
+        }
+    }
+};
+
+
+function sshTo(host, user, pass, command, b){
+	var c = new Connection();
+	var activity = b.add();
+	c.on('ready', function() {
+	  console.log('Connection :: ready');
+	  c.exec(command, function(err, stream) {
+	    if (err) throw err;
+	    stream.on('data', function(data, extended) {
+	      results[host]=1;
+	      console.log('HOST:' + host + ' ' + (extended === 'stderr' ? 'STDERR: ' : 'STDOUT: ')+data);
+	      //results[host]='HOST:' + host + ' ' + (extended === 'stderr' ? 'STDERR: ' : 'STDOUT: ')+data;
+	      if(!(extended === 'stderr')){      
+		results[host]=2;
+	      } 
+	    });
+	    stream.on('end', function() {
+	      console.log('Stream :: EOF');
+	    });
+	    stream.on('close', function() {
+	      console.log('Stream :: close');
+	    });
+	    stream.on('exit', function(code, signal) {
+	      console.log('Stream :: exit :: code: ' + code + ', signal: ' + signal);
+	      c.end();
+	    });
+	  });
+	});
+	c.on('error', function(err) {
+	  console.log('Connection :: error :: ' + err);
+	});
+	c.on('end', function() {
+	  console.log('Connection :: end');
+	});
+	c.on('close', function(had_error) {
+	  console.log('Connection :: close ' + host);
+	  activity.finish();
+	});
+	c.connect({
+	  host: host,
+	  port: 22,
+      username: process.env.LOGNAME,
+      privateKey: require('fs').readFileSync(process.env.HOME+'/.ssh/id_rsa')
+	});
+}
+
+// Load the http module to create an http server.
+var http = require('http');
+var url = require('url');
+
+// Configure our HTTP server to respond with Hello World to all requests.
+var server = http.createServer(function (request, response) {
+ 
+    var pathname = url.parse(request.url).pathname;
+
+    console.log('request pathname=' + pathname);
+
+    if(pathname !== '/crts_status_xxx') {
+        response.end('Bad request');
+        return;
+    }
+
+    var b = new Barrier(function() {
+	    console.log("Barrier reached");
+	    var arrayResults=[];
+        // make the first 12 nodes look like failures
+        var skip = 0;
+	    for (var key in results) {
+            if(skip !== 0) { results[key] = 1; --skip; }
+		    console.log(key, results[key] + '\r\n');
+	    	arrayResults.push(results[key]);
+	    }
+	    var url_parts = url.parse(request.url, true);
+	    var cb = url_parts.query.callback;
+	    response.writeHead(200, {"Content-Type": "text/html"});
+	    response.end(cb+'('+JSON.stringify(arrayResults)+')');
+	    console.log(url_parts);
+            console.log(cb+'('+JSON.stringify(arrayResults)+')');
+            console.log(response.end);
+	    console.log(response);
+	});
+
+	for (var i=ipNumbersStartFrom; i<IPsEnd; i++)
+		results['192.168.1.'+i]=0;
+
+	for (var i=ipNumbersStartFrom; i<IPsEnd; i++)
+        sshTo('192.168.1.'+i,'user','pass',  'uhd_find_devices', b);
+});
+
+
+server.listen(8890);
+
+// TODO: get IP address or domain name at runtime.
+console.log("\nTry:  http://128.173.221.40:8890/crts_status_xxx\n\n");
+

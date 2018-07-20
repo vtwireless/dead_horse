@@ -1,0 +1,51 @@
+linux; GNU C++ version 4.8.4; Boost_105400; UHD_003.008.004-0-g93011c14
+
+
+--------------------------------------------------------------
+-                    node parameters                         -
+--------------------------------------------------------------
+General Settings:
+    Team name:                         node2
+    Node type:                         Cognitive Radio
+    Cognitive Radio type:              Extensible Cognitive Radio
+    Server IP:                         192.168.1.39
+
+Virtual Network Interface Settings:
+    CRTS IP:                           10.0.0.3
+    Target IP:                         10.0.0.2
+    Traffic pattern:                   stream
+    Average throughput:                20000000.00
+
+Cognitive Engine Settings:
+    Cognitive Engine:                  CE_Template
+    CE timeout:                        500.00
+
+Log/Report Settings:
+    Physical layer rx log file:        Tutorial1_node_2_cognitive_radio_phy_rx
+    Physical layer tx log file:        Tutorial1_node_2_cognitive_radio_phy_tx
+    Network layer rx log file:         Tutorial1_node_2_cognitive_radio_net_rx
+    Network layer tx log file:         Tutorial1_node_2_cognitive_radio_net_tx
+    Generate octave logs:              0
+
+Initial USRP Settings:
+    Receive frequency:                 8.65e+08
+    Receive rate:                      1.00e+06
+    Receive gain:                      0.00
+    Transmit frequency:                8.61e+08
+    Transmit rate:                     1.00e+06
+    Transmit gain:                     25.00
+
+Initial Liquid OFDM Settings
+    Receive subcarriers:               32
+    Receive cyclic prefix length:      16
+    Receive taper length:              4
+    Transmit subcarriers:              32
+    Transmit cyclic prefix length:     16
+    Transmit taper length:             4
+    Transmit soft gain:                -12.00
+    Transmit modulation:               qam4
+    Transmit CRC:                      none
+    Transmit FEC0:                     none
+    Transmit FEC1:                     none
+--------------------------------------------------------------
+CRTS: Reached termination. Sending termination message to controller

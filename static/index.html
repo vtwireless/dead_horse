@@ -1,0 +1,1660 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>CORNET 3D</title>
+    <link rel="shortcut icon" href="brainIcon3.gif" />
+    <!--  =============== JAVASCRIPT FILES ============================= -->
+    <script type="text/javascript" src="x3dom.js"></script>
+    <!--<script src='http://128.173.221.40:8888/socket.io/socket.io.js'></script>-->
+    <script type="text/javascript" src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js'></script>
+    <script type="text/javascript" src="lib/otooltip.js"></script>
+    <script type="text/javascript" src="lib/spectrum.js"></script>
+    <script type="text/javascript" src="lib/sensors.js"></script>
+    <script type="text/javascript" src="lib/selOverlay.js"></script>
+    <script type="text/javascript" src="lib/RGraph.common.core.js" ></script>
+    <script type="text/javascript" src="lib/RGraph.line.js" ></script>
+    <script type="text/javascript" src="lib/axes.js" ></script>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+    <script type="text/javascript" src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="lib/mainVisualization.js"></script>    
+    <script type="text/javascript" src="lib/GameController.js"></script>
+    <script type="text/javascript" src="lib/Tutorial.js"></script>
+    <script type="text/javascript" src="lib/cornetControls.js"></script>
+    <script type="text/javascript" src="config/TutorialConfig.js"></script>
+    <!--  =============== CSS FILES ============================= -->
+    <link rel="stylesheet" type="text/css" href="x3dom.css" />    
+    <link rel="stylesheet" type="text/css" href="lib/otooltip.css" />
+    <link rel="stylesheet" type="text/css" href="lib/text_and_tables.css" />
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+    <link rel="stylesheet" type="text/css" href="styling/css/mainStyles.css" />
+    <link rel="stylesheet" href="styling/css/style.css" type="text/css" media="screen"/>
+    <style>
+        
+        path { 
+          stroke: steelblue;
+          stroke-width: 2;
+          fill: none;
+        }
+        .axis path,
+        .axis line {
+          fill: none;
+          
+          shape-rendering: crispEdges;
+        }
+
+        .area {
+          fill: steelblue;
+        }
+        
+        .tick text{
+            font-size: 12px;
+          }
+
+          .tick line{
+            opacity: 0.2;
+          }
+          #container, #containera, #containerb,#Teams_container{width:100%;}
+          
+          #left,#leftb,#leftt,#leftb_team{float:left;width:300px;height:300px;padding-left:10px;}
+          #right,#rightb,#rightt,#rightb_team{float:right;width:300px;height:300px;padding-right:10px;}
+          
+          .svg-container {
+            display: inline-block;
+            position: relative;
+            width: 100%;
+            padding-bottom: 100%; /* aspect ratio */
+            vertical-align: top;
+            overflow: hidden;
+            }
+        .svg-content-responsive {
+            display: inline-block;
+            position: absolute;
+            top: 10px;
+            left: 0;
+        }
+    </style>
+  </head>
+  
+  <body>
+    <div id="header" style="font-size:16px; font-weight:bold;"></div>
+
+    <!-- =================== WEB GL CANVAS / X3DOM Plugin ================== -->
+    <X3D id="x3dEl" 
+         xmlns="http://www.x3dom.org/x3dom" 
+         showStat="false" showLog="false" 
+         x="0px" y="0px" 
+         altImg="noWebGL.jpg" 
+         style="width:100%;height:98%;border-style:none;cursor:default;" 
+         onmouseover="oTooltip.append(event,'tooltip');" 
+         onmousemove="oTooltip.follow(event);" 
+         onmouseout="oTooltip.remove();">
+			<Scene>
+				<background skyColor='0 0.2 0.5 0 0 0'></background>
+				<viewpoint id="view_1" position='0 10 15' orientation='-1 0 0 0.5'></viewpoint>
+				<NavigationInfo headlight='false'></navigationInfo><!--type='"EXAMINE" "ANY"' transitionType='"ANIMATE"' transitionTime='1.0'/--> 
+                                <!--DirectionalLight ambientIndensity="0.5" color='1 1 1' direction='0 0 -1'/--> 
+                                <!--directionalLight ambientIntensity='0.5' intensity='0.5' direction='1 0 0' global='true'>
+                                                          </directionalLight-->
+                                
+                                <!--directionalLight ambientIntensity='0.5' intensity='0.5' direction='0 0 -1' global='true'>
+                                      </directionalLight-->
+				<Transform id='rootT' rotation="1 0 0 0">
+					<Group id='floorsGroup'>
+                                            <directionalLight ambientIntensity='0' intensity='0.5' direction='0 -1 0' global='false'>
+                                      </directionalLight>
+						<Group>
+							<Transform DEF='dad_Cylinder1' translation='4.56448 0 2.86242'>
+							  <Shape DEF='Cylinder1' containerField='children'>
+							    <Appearance containerField='appearance'>
+                                                                <material id='node4color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0'></material>
+							    </Appearance>
+                                                              <cylinder DEF='GeoCylinder1' containerField='geometry' height='0.501' radius='.2'></cylinder>
+							  </Shape>
+							</Transform>
+							<Transform DEF='dad_Cylinder2' translation='6.37599 0 1.70642'>
+								<Shape DEF='Cylinder2' containerField='children'>
+									<Appearance containerField='appearance'>
+										<material id='node2color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0' ></material>
+									</Appearance>
+									<Cylinder DEF='GeoCylinder2' containerField='geometry' height='0.501' radius='.2' ></cylinder>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Cylinder3' translation='5.23152 0 1.70642'>
+								<Shape DEF='Cylinder3' containerField='children'>
+									<Appearance containerField='appearance'>
+										<material id='node3color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0' ></material>
+									</Appearance>
+									<Cylinder DEF='GeoCylinder3' containerField='geometry' height='0.501' radius='.2' ></cylinder>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Cylinder4' translation='3.09749 0 1.72363'>
+								<Shape DEF='Cylinder4' containerField='children'>
+									<Appearance containerField='appearance'>
+										<material id='node5color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0' ></material>
+									</Appearance>
+									<Cylinder DEF='GeoCylinder4' containerField='geometry' height='0.501' radius='.2' ></cylinder>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Cylinder6' translation='1.53138 0 1.73223'>
+								<Shape DEF='Cylinder6' containerField='children'>
+									<Appearance containerField='appearance'>
+										<material id='node6color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0' ></material>
+									</Appearance>
+									<Cylinder DEF='GeoCylinder6' containerField='geometry' height='0.501' radius='.2' ></cylinder>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Cylinder7' translation='.11157 0 2.23132'>
+								<Shape DEF='Cylinder7' containerField='children'>
+									<Appearance containerField='appearance'>
+										<Material id='node7color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0' ></material>
+									</Appearance>
+									<Cylinder DEF='GeoCylinder7' containerField='geometry' height='0.501' radius='.2' ></cylinder>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Cylinder8' translation='-1.24802 0 1.76665'>
+								<Shape DEF='Cylinder8' containerField='children'>
+									<Appearance containerField='appearance'>
+										<Material id='node8color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0'  ></material>
+									</Appearance>
+									<Cylinder DEF='GeoCylinder8' containerField='geometry' height='0.501' radius='.2' ></cylinder>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Cylinder9' translation='-2.08271 0 2.22272'>
+								<Shape DEF='Cylinder9' containerField='children'>
+									<Appearance containerField='appearance'>
+										<Material id='node9color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0' ></material>
+									</Appearance>
+									<Cylinder DEF='GeoCylinder9' containerField='geometry' height='0.501' radius='.2' ></cylinder>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Cylinder10' translation='-3.33903 0 1.72363'>
+								<Shape DEF='Cylinder10' containerField='children'>
+									<Appearance containerField='appearance'>
+										<Material id='node10color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0'  ></material>
+									</Appearance>
+									<Cylinder DEF='GeoCylinder10' containerField='geometry' height='0.501' radius='.2' ></cylinder>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Cylinder11' translation='-4.30279 0 2.21411'>
+								<Shape DEF='Cylinder11' containerField='children'>
+									<Appearance containerField='appearance'>
+										<Material id='node11color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0'  ></material>
+									</Appearance>
+									<Cylinder DEF='GeoCylinder11' containerField='geometry' height='0.501' radius='.2' ></cylinder>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Cylinder12' translation='-5.84308 0 1.23314'>
+								<Shape DEF='Cylinder12' containerField='children'>
+									<Appearance containerField='appearance'>
+										<Material id='node12color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0'  ></material>
+									</Appearance>
+									<Cylinder DEF='GeoCylinder12' containerField='geometry' height='0.501' radius='.2' ></cylinder>
+								</Shape>
+							</Transform>
+							<transform translation="-10.005 0 3.66" rotation="1 0 0 3.14159">
+								<shape id="terrainShape1">
+									<appearance>
+										<material id="floor1mat" diffuseColor='0.4 0.4 0.1' transparency='0.2'></material>
+                                                                                <ImageTexture url='floor1.jpg' ></imagetexture>
+									</appearance>
+									<elevationGrid id='floor1' height='0.0 0.0 0.0 0.0' solid='false' xDimension='2' zDimension='2' xSpacing='20.01' zSpacing='7.32' ccw='TRUE' colorPerVertex='true'></elevationGrid>
+								</shape>
+							</transform>
+							<Transform DEF='dad_Cylinder13' translation='7.7958 0 1.72363'>
+								<Shape DEF='Cylinder13' containerField='children'>
+									<Appearance containerField='appearance'>
+										<material id='node1color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0' ></material>
+									</Appearance>
+									<Cylinder DEF='GeoCylinder13' containerField='geometry' height='0.501' radius='.2' ></cylinder>
+								</Shape>
+							</Transform>
+						</Group>
+						<Group>
+							<transform translation="-9.99 1.5 3.24" rotation="1 0 0 3.14159">
+								<shape id="terrainShape2">
+									<appearance>
+										<material id="floor2mat" diffuseColor='0.4 0.4 0.1' transparency='0.2'></material>
+										<ImageTexture
+                                                                                url='floor2.png' ></imagetexture>
+									</appearance>
+									<elevationGrid id='floor2' height='0.0 0.0 0.0 0.0' solid='false' xDimension='2' zDimension='2' xSpacing='19.98' zSpacing='6.48' ccw='TRUE' colorPerVertex='true'></elevationGrid>
+								</shape>
+							</transform>
+							<Transform DEF='dad_Sphere1' translation='6.27908 1.5 1.19348'>
+								<Shape DEF='Sphere1' containerField='children'>
+									<Appearance containerField='appearance'>
+										<material id='node14color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0' ></material>
+									</Appearance>
+                                                                    <Sphere DEF='GeoSphere1' containerField='geometry' radius='.201' ></sphere>
+                                         
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Sphere2' translation='7.92152 1.5 1.20725'>
+								<Shape DEF='Sphere2' containerField='children'>
+									<Appearance containerField='appearance'>
+										<material id='node13color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0' ></material>
+									</Appearance>
+                                                                    <Sphere DEF='GeoSphere2' containerField='geometry' radius='.201' ></sphere>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Sphere3' translation='4.89001 1.5 1.21515'>
+								<Shape DEF='Sphere3' containerField='children'>
+									<Appearance containerField='appearance'>
+										<material id='node15color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0' ></material>
+									</Appearance>
+                                                                    <Sphere DEF='GeoSphere3' containerField='geometry' radius='.201' ></sphere>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Sphere4' translation='3.69215 1.5 1.88085'>
+								<Shape DEF='Sphere4' containerField='children'>
+									<Appearance containerField='appearance'>
+										<material id='node16color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0' ></material>
+									</Appearance>
+                                                                    <Sphere DEF='GeoSphere4' containerField='geometry' radius='.201' ></sphere>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Sphere5' translation='2.9455 1.5 1.20242'>
+								<Shape DEF='Sphere5' containerField='children'>
+									<Appearance containerField='appearance'>
+										<Material id='node17color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0'  ></material>
+									</Appearance>
+                                                                    <Sphere DEF='GeoSphere5' containerField='geometry' radius='.201' ></sphere>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Sphere6' translation='1.00118 1.5 1.96044'>
+								<Shape DEF='Sphere6' containerField='children'>
+									<Appearance containerField='appearance'>
+										<Material id='node18color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0'  ></material>
+									</Appearance>
+									<Sphere DEF='GeoSphere6' containerField='geometry' radius='.201' ></sphere>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Sphere7' translation='.15598 1.5 2.66161'>
+								<Shape DEF='Sphere7' containerField='children'>
+									<Appearance containerField='appearance'>
+										<Material id='node19color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0' ></material>
+									</Appearance>
+									<Sphere DEF='GeoSphere7' containerField='geometry' radius='.201' ></sphere>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Sphere8' translation='-1.37496 1.5 1.39167'>
+								<Shape DEF='Sphere8' containerField='children'>
+									<Appearance containerField='appearance'>
+										<Material id='node20color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0'  ></material>
+									</Appearance>
+									<Sphere DEF='GeoSphere8' containerField='geometry' radius='.201' ></sphere>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Sphere9' translation='-1.78404 1.5 2.02851'>
+								<Shape DEF='Sphere9' containerField='children'>
+									<Appearance containerField='appearance'>
+										<Material id='node21color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0' ></material>
+									</Appearance>
+									<Sphere DEF='GeoSphere9' containerField='geometry' radius='.201' ></sphere>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Sphere10' translation='-3.00573 1.5 2.02214'>
+								<Shape DEF='Sphere10' containerField='children'>
+									<Appearance containerField='appearance'>
+										<Material id='node22color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0'  ></material>
+									</Appearance>
+									<Sphere DEF='GeoSphere10' containerField='geometry' radius='.201' ></sphere>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Sphere11' translation='-4.16698 1.5 2.01577'>
+								<Shape DEF='Sphere11' containerField='children'>
+									<Appearance containerField='appearance'>
+										<Material id='node23color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0' ></material>
+									</Appearance>
+									<Sphere DEF='GeoSphere11' containerField='geometry' radius='.201' ></sphere>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Sphere12' translation='-5.04826 1.5 2.02532'>
+								<Shape DEF='Sphere12' containerField='children'>
+									<Appearance containerField='appearance'>
+										<Material id='node24color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0' ></material>
+									</Appearance>
+                                                                    <Sphere DEF='GeoSphere12' containerField='geometry' radius='.201' ></sphere>
+								</Shape>
+							</Transform>
+						</Group>
+						<Group>
+							<transform translation="-10.125 3 3.405" rotation="1 0 0 3.14159">
+								<shape id="terrainShape">
+									<appearance>
+										<material id='floor3mat' diffuseColor='0.4 0.4 0.1' transparency='0.2'></material>
+                                                                                <ImageTexture url='floor3.jpg' ></imagetexture>
+									</appearance>
+									<elevationGrid id='floor3' height='0.0 0.0 0.0 0.0' solid='false' xDimension='2' zDimension='2' xSpacing='20.25' zSpacing='6.81' ccw='TRUE' colorPerVertex='true'></elevationGrid>
+								</shape>
+							</transform>
+							<Transform DEF='dad_Cylinder14' translation='8.06064 3 1.30611'>
+								<Shape DEF='Cylinder14' containerField='children'>
+									<Appearance containerField='appearance'>
+                                                                            <Material id='node25color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0' ></material>
+									</Appearance>
+									<Cylinder DEF='GeoCylinder23' containerField='geometry' height='.5' radius='.2' ></cylinder>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Cylinder15' translation='6.63245 3 1.30905'>
+								<Shape DEF='Cylinder15' containerField='children'>
+									<Appearance containerField='appearance'>
+										<Material id='node26color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0' ></material>
+									</Appearance>
+									<Cylinder DEF='GeoCylinder24' containerField='geometry' height='.5' radius='.2' ></cylinder>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Cylinder3-3' translation='5.07863 3 1.32924'>
+								<Shape DEF='Cylinder3-3' containerField='children'>
+									<Appearance containerField='appearance'>
+                                                                            <Material id='node27color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0' ></material>
+									</Appearance>
+									<Cylinder DEF='GeoCylinder2' containerField='geometry' height='.5' radius='.2' ></cylinder>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Cylinder3-4' translation='4.14439 3 1.89426'>
+								<Shape DEF='Cylinder3-4' containerField='children'>
+									<Appearance containerField='appearance'>
+										<Material id='node28color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0' ></material>
+									</Appearance>
+									<Cylinder DEF='GeoCylinder25' containerField='geometry' height='.5' radius='.2' ></cylinder>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Cylinder3-5' translation='3.24931 3 1.374'>
+								<Shape DEF='Cylinder3-5' containerField='children'>
+									<Appearance containerField='appearance'>
+										<Material id='node29color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0' ></material>
+									</Appearance>
+									<Cylinder DEF='GeoCylinder3' containerField='geometry' height='.5' radius='.2' ></cylinder>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Cylinder3-6' translation='1.47594 3 1.99496'>
+								<Shape DEF='Cylinder3-6' containerField='children'>
+									<Appearance containerField='appearance'>
+										<Material id='node30color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0' ></material>
+									</Appearance>
+									<Cylinder DEF='GeoCylinder4' containerField='geometry' height='.5' radius='.2' ></cylinder>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Cylinder3-7' translation='.22284 3 2.75018'>
+								<Shape DEF='Cylinder3-7' containerField='children'>
+									<Appearance containerField='appearance'>
+										<Material id='node31color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0' ></material>
+									</Appearance>
+                                                                    <Cylinder DEF='GeoCylinder5' containerField='geometry' height='.5' radius='.2' ></cylinder>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Cylinder3-8' translation='-.41491 3 .90408'>
+								<Shape DEF='Cylinder3-8' containerField='children'>
+									<Appearance containerField='appearance'>
+										<Material id='node32color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0' ></material>
+									</Appearance>
+									<Cylinder DEF='GeoCylinder6' containerField='geometry' height='.5' radius='.2' ></cylinder>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Cylinder3-9' translation='-1.5841 3 1.97258'>
+								<Shape DEF='Cylinder3-9' containerField='children'>
+									<Appearance containerField='appearance'>
+										<Material id='node33color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0' ></material>
+									</Appearance>
+									<Cylinder DEF='GeoCylinder7' containerField='geometry' height='.5' radius='.2' ></cylinder>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Cylinder3-10' translation='-2.82602 3 2.01174'>
+								<Shape DEF='Cylinder3-10' containerField='children'>
+									<Appearance containerField='appearance'>
+										<Material id='node34color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0' ></material>
+									</Appearance>
+									<Cylinder DEF='GeoCylinder8' containerField='geometry' height='.5' radius='.2' ></cylinder>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Cylinder3-11' translation='-3.80501 3 2.01174'>
+								<Shape DEF='Cylinder3-11' containerField='children'>
+									<Appearance containerField='appearance'>
+										<Material id='node35color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0'></material>
+									</Appearance>
+                                                                    <Cylinder DEF='GeoCylinder9' containerField='geometry' height='.5' radius='.2' ></cylinder>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Cylinder3-12' translation='-4.85113 3 2.00614'>
+								<Shape DEF='Cylinder3-12' containerField='children'>
+									<Appearance containerField='appearance'>
+										<Material id='node36color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0' ></material>
+									</Appearance>
+									<Cylinder DEF='GeoCylinder10' containerField='geometry' height='.5' radius='.2' ></cylinder>
+								</Shape>
+							</Transform>
+						</Group>
+						<Group>
+							<transform translation="-10.125 4.5 3.54" rotation="1 0 0 3.14159">
+								<shape>
+									<appearance>
+										<material id="floor4mat" diffuseColor='0.4 0.4 0.1' transparency='0.2'></material>
+										<ImageTexture url='floor4.jpg' ></imagetexture>
+									</appearance>
+									<elevationGrid id='floor4' height='0.0 0.0 0.0 0.0' solid='false' xDimension='2' zDimension='2' xSpacing='20.25' zSpacing='7.08' ccw='TRUE' colorPerVertex='true'></elevationGrid>
+								</shape>
+							</transform>
+							<Transform DEF='dad_Sphere4-1' translation='7.96327 4.5 1.38747'>
+								<Shape DEF='Sphere4-1' containerField='children'>
+									<Appearance containerField='appearance'>
+										<Material id='node37color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0' ></material>
+									</Appearance>
+                                                                    <Sphere DEF='GeoSphere23' containerField='geometry' radius='.231' ></sphere>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Sphere4-2' translation='6.86619 4.5 1.41132'>
+								<Shape DEF='Sphere4-2' containerField='children'>
+									<Appearance containerField='appearance'>
+										<Material id='node38color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0' ></material>
+									</Appearance>
+									<Sphere DEF='GeoSphere24' containerField='geometry' radius='.231' ></sphere>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Sphere4-3' translation='5.55923 4.5 1.4304'>
+								<Shape DEF='Sphere4-3' containerField='children'>
+									<Appearance containerField='appearance'>
+                                                                            <Material id='node39color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0' ></material>
+									</Appearance>
+									<Sphere DEF='GeoSphere25' containerField='geometry' radius='.231' ></sphere>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Sphere4-4' translation='4.09487 4.5 2.10773'>
+								<Shape DEF='Sphere4-4' containerField='children'>
+									<Appearance containerField='appearance'>
+										<Material id='node40color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0' ></material>
+									</Appearance>
+									<Sphere DEF='GeoSphere26' containerField='geometry' radius='.231' ></sphere>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Sphere4-5' translation='3.17905 4.5 1.4781'>
+								<Shape DEF='Sphere4-5' containerField='children'>
+									<Appearance containerField='appearance'>
+										<Material id='node41color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0' ></material>
+									</Appearance>
+									<Sphere DEF='GeoSphere27' containerField='geometry' radius='.231' ></sphere>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Sphere4-6' translation='1.07551 4.5 2.12681'>
+								<Shape DEF='Sphere4-6' containerField='children'>
+									<Appearance containerField='appearance'>
+										<Material id='node42color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0' ></material>
+									</Appearance>
+									<Sphere DEF='GeoSphere28' containerField='geometry' radius='.231' ></sphere>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Sphere4-7' translation='.2217 4.5 2.88046'>
+								<Shape DEF='Sphere4-7' containerField='children'>
+									<Appearance containerField='appearance'>
+										<Material id='node43color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0' ></material>
+									</Appearance>
+									<Sphere DEF='GeoSphere29' containerField='geometry' radius='.231' ></sphere>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Sphere4-8' translation='-.56057 4.5 .94864'>
+								<Shape DEF='Sphere4-8' containerField='children'>
+									<Appearance containerField='appearance'>
+										<Material id='node44color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0' ></material>
+									</Appearance>
+									<Sphere DEF='GeoSphere30' containerField='geometry' radius='.231' ></sphere>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Sphere4-9' translation='-1.46685 4.5 2.16974'>
+								<Shape DEF='Sphere4-9' containerField='children'>
+									<Appearance containerField='appearance'>
+										<Material id='node45color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0' ></material>
+									</Appearance>
+									<Sphere DEF='GeoSphere31' containerField='geometry' radius='.231' ></sphere>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Sphere4-10' translation='-3.04092 4.5 2.13635'>
+								<Shape DEF='Sphere4-10' containerField='children'>
+									<Appearance containerField='appearance'>
+										<Material id='node46color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0' ></material>
+									</Appearance>
+									<Sphere DEF='GeoSphere32' containerField='geometry' radius='.231' ></sphere>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Sphere4-11' translation='-4.18093 4.5 2.12204'>
+								<Shape DEF='Sphere4-11' containerField='children'>
+									<Appearance containerField='appearance'>
+										<Material id='node47color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0'></material>
+									</Appearance>
+									<Sphere DEF='GeoSphere33' containerField='geometry' radius='.231' ></sphere>
+								</Shape>
+							</Transform>
+							<Transform DEF='dad_Sphere4-12' translation='-5.19692 4.5 2.12681'>
+								<Shape DEF='Sphere4-12' containerField='children'>
+									<Appearance containerField='appearance'>
+										<Material id='node48color' ambientIntensity='.2' shininess='.2' diffuseColor='1 0 0' ></material>
+									</Appearance>
+									<Sphere DEF='GeoSphere34' containerField='geometry' radius='.231' ></sphere>
+								</Shape>
+							</Transform>
+						</Group>
+					</Group>
+					<Group id='specGroup' render='false'>
+						<transform id="elevationGridVis" translation="-10.125 3 0" scale="1 1 1">
+                                                    
+							<transform>
+                                                        <!--directionalLight ambientIntensity='0' intensity='0.5' direction='1 0 0' global='false'>
+                                                      </directionalLight>
+                                                            <directionalLight ambientIntensity='0' intensity='0.5' direction='-1 0 0' global='false'>
+                                                      </directionalLight-->
+                                                                <shape>
+									<appearance>
+										<material id='specMat' ambientIntensity ='0.2' shininess = '0.1' diffuseColor='1 1 1' emissiveColor='0 0 0'></material>
+									</appearance>
+									<elevationGrid id='specGrid' height='0.0 0.0 0.0 0.0' solid='false' xDimension='2' zDimension='2' xSpacing='20.25' zSpacing='6.81' creaseAngle='3' ccw='FALSE' colorPerVertex='true'>
+										<color id="specGridColor" color='0 0 0 0 0 0 0 0 0 0 0 0'></color>
+									</elevationGrid>							
+								</shape>
+							</transform>
+							
+							<transform translation="0 0 0">
+							<!-- add axis here -->
+							<!--
+								<Coordinate point='24.1 -3.0 5.0 -4.2 -3.0 5.0 -4.2 3.0 5.0'/>
+							-->
+								<Shape>
+									<Appearance>
+                                                                            <Material diffuseColor='0 0 0' emissiveColor='1 1 1' ></material>
+									</Appearance> 
+									<IndexedLineSet coordIndex='0 1 2 -1 1 3 -1'>
+										<Coordinate point='21 0 0 0 0 0 0 5 0 0 0 8'></coordinate>
+									</IndexedLineSet>
+								</Shape>
+								
+								
+								<Shape>
+									<Appearance>
+										<Material diffuseColor='0 0 0' emissiveColor='1 1 1'></material>
+									</Appearance> 
+									<IndexedLineSet coordIndex='0 1 -1 2 1 3 2 -1'>
+                                                                            <Coordinate point='25 0 8 26 0 8 25.8 0.2 8 25.8 -0.2 8'></coordinate>
+									</IndexedLineSet>
+								</Shape>
+								
+								<Shape>
+									<Appearance>
+										<Material diffuseColor='0 0 0' emissiveColor='1 1 1'></material>
+									</Appearance> 
+									<IndexedLineSet coordIndex='0 1 -1 2 0 3 2 -1'>
+										<Coordinate point='-1 0 9 -1 0 8 -0.8 0 8.8 -1.2 0 8.8'></coordinate>
+									</IndexedLineSet>
+								</Shape>
+								
+								<Shape>
+									<Appearance>
+										<Material diffuseColor='0 0 0' emissiveColor='1 1 1'></material>
+									</Appearance> 
+									<IndexedLineSet coordIndex='0 1 -1 2 1 3 2 -1'>
+										<Coordinate point='-4 4.5 0 -4 5.5 0 -4.2 5.3 0 -3.8 5.3 0'></coordinate>
+									</IndexedLineSet>
+								</Shape>
+								
+								<Shape>
+									<Appearance>
+										<Material diffuseColor='0 0 0' emissiveColor='1 1 1'></material>
+									</Appearance> 
+									<IndexedLineSet coordIndex='0 1 2 3 0 -1 4 5 6 7 4 -1 8 9 10 11 8 -1 12 13 14 15 12 -1 16 17 18 19 16 -1 20 21 22 23 20 -1 24 25 26 27 24 -1 28 29 30 31 28 -1'>
+										<Coordinate point= '0 0 1 21 0 1 21 5 1 0 5 1 
+															0 0 2 21 0 2 21 5 2 0 5 2 
+															0 0 3 21 0 3 21 5 3 0 5 3
+															0 0 4 21 0 4 21 5 4 0 5 4
+															0 0 5 21 0 5 21 5 5 0 5 5
+															0 0 6 21 0 6 21 5 6 0 5 6
+															0 0 7 21 0 7 21 5 7 0 5 7
+															0 0 8 21 0 8 21 5 8 0 5 8'></coordinate>
+									</IndexedLineSet>
+								</Shape>
+								
+								<Shape>
+									<Appearance>
+										<Material diffuseColor='0 0 0' emissiveColor='1 1 1'></material>
+									</Appearance> 
+									<IndexedLineSet coordIndex='0 1 2 3 0 -1 4 5 6 7 4 -1 8 9 10 11 8 -1 12 13 14 15 12 -1 16 17 18 19 16 -1 20 21 22 23 20 -1 24 25 26 27 24 -1'>
+										<Coordinate point= '3 0 0 3 0 8 3 5 8 3 5 0
+															6 0 0 6 0 8 6 5 8 6 5 0
+															9 0 0 9 0 8 9 5 8 9 5 0
+															12 0 0 12 0 8 12 5 8 12 5 0
+															15 0 0 15 0 8 15 5 8 15 5 0
+															18 0 0 18 0 8 18 5 8 18 5 0
+															21 0 0 21 0 8 21 5 8 21 5 0'></coordinate>
+									</IndexedLineSet>
+								</Shape>
+								
+								<Shape>
+									<Appearance>
+										<Material diffuseColor='0 0 0' emissiveColor='1 1 1'></material>
+									</Appearance> 
+									<IndexedLineSet coordIndex='0 1 2 3 0 -1 4 5 6 7 4 -1 8 9 10 11 8 -1 12 13 14 15 12 -1 16 17 18 19 16 -1'>
+										<Coordinate point= '0 1 0 21 1 0 21 1 8 0 1 8
+															0 2 0 21 2 0 21 2 8 0 2 8
+															0 3 0 21 3 0 21 3 8 0 3 8
+															0 4 0 21 4 0 21 4 8 0 4 8
+															0 5 0 21 5 0 21 5 8 0 5 8'></coordinate>
+									</IndexedLineSet>
+								</Shape>
+								
+								
+								
+							</transform>
+							
+							<transform translation="0 0 0">
+							<!-- Axes ticks added here -->
+								<Shape>
+									<Appearance>
+										<Material diffuseColor='0 0 0' emissiveColor='1 1 1'></material>
+									</Appearance> 
+									<IndexedLineSet coordIndex='-1 0 1 -1 2 3 -1 4 5 -1'>
+										<Coordinate point='0 -0.25 0 0 0.25 0 10.5 -0.25 0 10.5 0.25 0 21 -0.25 0 21 0.25 0'></coordinate>
+									</IndexedLineSet>
+								</Shape>
+								<Shape>
+									<Appearance>
+										<Material diffuseColor='0 0 0' emissiveColor='1 1 1'></material>
+									</Appearance> 
+									<IndexedLineSet coordIndex='-1 0 1 -1 2 3 -1 4 5 -1'>
+										<Coordinate point='-0.25 0 0 0.25 0 0 -0.25 2.5 0 0.25 2.5 0 -0.25 5 0 0.25 5 0'></coordinate>
+									</IndexedLineSet>
+								</Shape>
+								<Shape>
+									<Appearance>
+										<Material diffuseColor='0 0 0' emissiveColor='1 1 1'></material>
+									</Appearance> 
+									<IndexedLineSet coordIndex='-1 0 1 -1 2 3 -1 4 5 -1'>
+										<Coordinate point='0 -0.25 0 0 0.25 0 0 -0.25 4 0 0.25 4 0 -0.25 8 0 0.25 8'></coordinate>
+									</IndexedLineSet>
+								</Shape>
+							</transform>
+							
+							<!-- Axes tick labels -->
+							<transform translation="0 0 0" id="axes_tick_labels">
+                                                            <directionalLight ambientIntensity='0' intensity='0.5' direction='0 0 -1' global='false'>
+                                                      </directionalLight>
+								<!-- X-axis tick label-1 -->
+								<Transform DEF='tick1_x' translation='1 0 8'>
+									<Billboard DEF='Group1' containerField='children' axisOfRotation='0 0 0'>
+										<Transform DEF='tick1_x-label' containerField='children' translation='0 0 0'>
+											<Shape DEF='X-axis-tick-1' containerField='children'>
+												<Appearance containerField='appearance'>
+                                                                                                    <Material DEF='Shiny_White' containerField='material' ambientIntensity='.2' shininess='.1' diffuseColor='1 1 1' specularColor='1 1 1'></material>
+												</Appearance>
+												<Text DEF='GeoText1' containerField='geometry' id="tick1-x" string='' maxExtent='0'>
+                                                                                                <FontStyle containerField='fontStyle' family='SERIF' style='PLAIN' justify='"BEGIN" "BEGIN"' size='0.5' spacing='1'></fontstyle>
+												</Text>
+											</Shape>
+										</Transform>
+									</Billboard>
+								</Transform>
+								
+								<!-- X-axis tick label-2 -->
+								<Transform DEF='tick2_x' translation='10.5 0 8'>
+									<Billboard DEF='Group1' containerField='children' axisOfRotation='0 0 0'>
+										<Transform DEF='tick2_x-label' containerField='children' translation='0 0 0'>
+											<Shape DEF='X-axis-tick-2' containerField='children'>
+												<Appearance containerField='appearance'>
+                                                                                                    <Material DEF='Shiny_White' containerField='material' ambientIntensity='.2' shininess='.1' diffuseColor='1 1 1' specularColor='1 1 1'></material>
+												</Appearance>
+												<Text DEF='GeoText1' containerField='geometry' id="tick2-x" string='' maxExtent='0'>
+                                                                                                <FontStyle containerField='fontStyle' family='SERIF' style='PLAIN' justify='"BEGIN" "BEGIN"' size='0.5' spacing='1'></fontstyle>
+												</Text>
+											</Shape>
+										</Transform>
+									</Billboard>
+								</Transform>
+                                                                <Transform id='node_users'  DEF='node_usr_t' translation='0 0 0'>
+									<!-- Billboard  DEF='Group1' containerField='children' axisOfRotation='0 0 0'>
+										<Transform DEF='node_usr-label' containerField='children' translation='0 0 0'>
+											
+                                                                                    <Shape DEF='node_usr_s' containerField='children'>
+                                                                                        <Appearance containerField='appearance'>
+                                                                                            <Material id="usr_color" diffuseColor='0 0 0'></material>
+                                                                                        </Appearance>
+
+                                                                                        <box id="node_usr_bar" size='0.1,0.1' ></box>
+										    </Shape>
+                                                                                    <Shape containerField='children'>
+                                                                                        <Appearance containerField='appearance'>
+                                                                                            <Material  diffuseColor='1 1 1'></material>
+                                                                                        </Appearance>
+                                                                                        <Text DEF='GeoText1' containerField='geometry' id="node_usr" string='' maxExtent='0'>
+                                                                                        <FontStyle containerField='fontStyle' family='SERIF' style='PLAIN' justify='"BEGIN" "BEGIN"' size='0.5' spacing='1'></fontstyle>
+                                                                                        </Text>
+										    </Shape>
+										</Transform>
+									</Billboard-->
+								</Transform>
+															
+								<!-- X-axis tick label-3 -->
+								<Transform DEF='tick3_x' translation='21 0 8'>
+									<Billboard DEF='Group1' containerField='children' axisOfRotation='0 0 0'>
+										<Transform DEF='tick3_x-label' containerField='children' translation='0 0 0'>
+											<Shape DEF='X-axis-tick-3' containerField='children'>
+												<Appearance containerField='appearance'>
+                                                                                                    <Material DEF='Shiny_White' containerField='material' ambientIntensity='.2' shininess='.1' diffuseColor='1 1 1' specularColor='1 1 1'></material>
+												</Appearance>
+												<Text DEF='GeoText1' containerField='geometry' id="tick3-x" string='' maxExtent='0'>
+                                                                                                <FontStyle containerField='fontStyle' family='SERIF' style='PLAIN' justify='"BEGIN" "BEGIN"' size='0.5' spacing='1'></fontstyle>
+												</Text>
+											</Shape>
+										</Transform>
+									</Billboard>
+								</Transform>
+								
+								<!-- Y-axis tick label-1 -->
+								<Transform DEF='tick1_y' translation='-2 0 0'>
+									<Billboard DEF='Group1' containerField='children' axisOfRotation='0 0 0'>
+										<Transform DEF='tick1_y-label' containerField='children' translation='0 0 0'>
+											<Shape DEF='Y-axis-tick-1' containerField='children'>
+												<Appearance containerField='appearance'>
+													<Material DEF='Shiny_White' containerField='material' ambientIntensity='.2' shininess='.1' diffuseColor='1 1 1' specularColor='1 1 1'></material>
+												</Appearance>
+												<Text DEF='GeoText1' containerField='geometry' id="tick1-y" string='' maxExtent='0'>
+													<FontStyle containerField='fontStyle' family='SERIF' style='PLAIN' justify='"BEGIN" "BEGIN"' size='0.5' spacing='1'></fontstyle>
+												</Text>
+											</Shape>
+										</Transform>
+									</Billboard>
+								</Transform>
+								
+								<!-- Y-axis tick label-2 -->
+								<Transform DEF='tick2_y' translation='-2 2.5 0'>
+									<Billboard DEF='Group1' containerField='children' axisOfRotation='0 0 0'>
+										<Transform DEF='tick2_y-label' containerField='children' translation='0 0 0'>
+											<Shape DEF='Y-axis-tick-2' containerField='children'>
+												<Appearance containerField='appearance'>
+                                                                                                    <Material DEF='Shiny_White' containerField='material' ambientIntensity='.2' shininess='.1' diffuseColor='1 1 1' specularColor='1 1 1'></material>
+												</Appearance>
+												<Text DEF='GeoText1' containerField='geometry' id="tick2-y" string='' maxExtent='0'>
+                                                                                                <FontStyle containerField='fontStyle' family='SERIF' style='PLAIN' justify='"BEGIN" "BEGIN"' size='0.5' spacing='1'></fontstyle>
+												</Text>
+											</Shape>
+										</Transform>
+									</Billboard>
+								</Transform>
+								
+								<!-- Y-axis tick label-3 -->
+								<Transform DEF='tick3_y' translation='-2 5 0'>
+									<Billboard DEF='Group1' containerField='children' axisOfRotation='0 0 0'>
+										<Transform DEF='tick3_y-label' containerField='children' translation='0 0 0'>
+											<Shape DEF='Y-axis-tick-3' containerField='children'>
+												<Appearance containerField='appearance'>
+                                                                                                    <Material DEF='Shiny_White' containerField='material' ambientIntensity='.2' shininess='.1' diffuseColor='1 1 1' specularColor='1 1 1'></material>
+												</Appearance>
+												<Text DEF='GeoText1' containerField='geometry' id="tick3-y" string='' maxExtent='0'>
+                                                                                                <FontStyle containerField='fontStyle' family='SERIF' style='PLAIN' justify='"BEGIN" "BEGIN"' size='0.5' spacing='1'></fontstyle>
+												</Text>
+											</Shape>
+										</Transform>
+									</Billboard>
+								</Transform>
+								
+								<!-- Z-axis tick label-1 -->
+								<Transform DEF='tick1_z' translation='0 1 0'>
+									<Billboard DEF='Group1' containerField='children' axisOfRotation='0 0 0'>
+										<Transform DEF='tick1_z-label' containerField='children' translation='0 0 0'>
+											<Shape DEF='Z-axis-tick-1' containerField='children'>
+												<Appearance containerField='appearance'>
+                                                                                                    <Material DEF='Shiny_White' containerField='material' ambientIntensity='.2' shininess='.1' diffuseColor='1 1 1' specularColor='1 1 1'></material>
+												</Appearance>
+												<Text DEF='GeoText1' containerField='geometry' id="tick1-z" string='' maxExtent='0'>
+                                                                                                <FontStyle containerField='fontStyle' family='SERIF' style='PLAIN' justify='"BEGIN" "BEGIN"' size='0.5' spacing='1'></fontstyle>
+												</Text>
+											</Shape>
+										</Transform>
+									</Billboard>
+								</Transform>
+								
+								<!-- Z-axis tick label-2 -->
+								<Transform DEF='tick2_z' translation='0 1 4'>
+									<Billboard DEF='Group1' containerField='children' axisOfRotation='0 0 0'>
+										<Transform DEF='tick2_z-label' containerField='children' translation='0 0 0'>
+											<Shape DEF='Z-axis-tick-2' containerField='children'>
+												<Appearance containerField='appearance'>
+                                                                                                    <Material DEF='Shiny_White' containerField='material' ambientIntensity='.2' shininess='.1' diffuseColor='1 1 1' specularColor='1 1 1'></material>
+												</Appearance>
+												<Text DEF='GeoText1' containerField='geometry' id="tick2-z" string='' maxExtent='0'>
+                                                                                                <FontStyle containerField='fontStyle' family='SERIF' style='PLAIN' justify='"BEGIN" "BEGIN"' size='0.5' spacing='1'></fontstyle>
+												</Text>
+											</Shape>
+										</Transform>
+									</Billboard>
+								</Transform>
+								
+								<!-- Z-axis tick label-3 -->
+								<Transform DEF='tick3_z' translation='0 1 8'>
+									<Billboard DEF='Group1' containerField='children' axisOfRotation='0 0 0'>
+										<Transform DEF='tick3_z-label' containerField='children' translation='0 0 0'>
+											<Shape DEF='Z-axis-tick-3' containerField='children'>
+												<Appearance containerField='appearance'>
+                                                                                                    <Material DEF='Shiny_White' containerField='material' ambientIntensity='.2' shininess='.1' diffuseColor='1 1 1' specularColor='1 1 1'></material>
+												</Appearance>
+												<Text DEF='GeoText1' containerField='geometry' id="tick3-z" string='' maxExtent='0'>
+                                                                                                <FontStyle containerField='fontStyle' family='SERIF' style='PLAIN' justify='"BEGIN" "BEGIN"' size='0.5' spacing='1'></fontstyle>
+												</Text>
+											</Shape>
+										</Transform>
+									</Billboard>
+								</Transform>
+							</transform>
+							
+							<!-- Axes labels -->
+							<transform translation="0 0 0">
+							
+								<!-- X-axes label -->
+								<Transform DEF='dad_Group1'
+								 translation='23.5 0 8'>					
+									<Billboard DEF='Group1'
+										containerField='children'
+										axisOfRotation='0 0 0'>
+										<Transform DEF='dad_X-axis-label'
+										containerField='children'
+										translation='0 0 0'>
+											<Shape DEF='X-axis-label'
+											containerField='children'>
+												<Appearance containerField='appearance'>
+													<Material DEF='Shiny_White'
+														containerField='material'
+														ambientIntensity='.2'
+														shininess='.1'
+														diffuseColor='1 1 1'
+                                                                                                                specularColor='1 1 1'></material>
+												</Appearance>
+												<Text DEF='GeoText1'
+													containerField='geometry'
+													string='"Frequency (MHz)"'
+													maxExtent='0'>
+												 <FontStyle
+													containerField='fontStyle'
+													family='SERIF'
+													style='BOLD'
+													justify='"BEGIN"
+													"BEGIN"'
+													size='0.5'
+                                                                                                        spacing='1'></fontstyle>
+												</Text>
+											</Shape>
+										</Transform>
+									</Billboard>
+								</Transform>
+								
+								<!-- Y-axes label -->
+								<Transform DEF='dad_Group2'
+								 translation='-3 4 -1'>
+									<Billboard DEF='Group2'
+										containerField='children'
+										axisOfRotation='0 0 0'>
+										<Transform DEF='dad_Y-axis-label'
+											containerField='children'
+											translation='0 0 0'>
+											<Shape DEF='Y-axis-label'
+												containerField='children'>
+												<Appearance
+													containerField='appearance'>
+													<Material
+														containerField='material'
+                                                                                                                USE='Shiny_White'></material>
+												</Appearance>
+												<Text DEF='GeoText2'
+													containerField='geometry'
+													string='"Power (dB)"'
+													maxExtent='0'>
+													<FontStyle
+														containerField='fontStyle'
+														family='SERIF'
+														style='BOLD'
+														justify='"BEGIN"
+														"BEGIN"'
+														size='0.5'
+                                                                                                                spacing='1'></fontstyle>
+												</Text>
+											</Shape>
+										</Transform>
+									</Billboard>
+								</Transform>
+								
+								<!-- Z-axes label -->
+								<Transform DEF='dad_Group3'
+									translation='-1 0 8'>
+									<Billboard DEF='Group3'
+										containerField='children'
+										axisOfRotation='0 0 0'>
+										<Transform DEF='dad_Z-axis-label'
+											containerField='children'
+											translation='0 0 0'>
+											<Shape DEF='Z-axis-label'
+												containerField='children'>
+												<Appearance
+													containerField='appearance'>
+													<Material
+														containerField='material'
+                                                                                                                USE='Shiny_White'></material>
+												</Appearance>
+												<Text DEF='GeoText3'
+													containerField='geometry'
+													string='"Time"'
+													maxExtent='0'>
+													<FontStyle
+														containerField='fontStyle'
+														family='SERIF'
+														style='BOLD'
+														justify='"BEGIN"
+														"BEGIN"'
+														size='0.5'
+                                                                                                                spacing='1'></fontstyle>
+												</Text>
+											</Shape>
+										</Transform>
+									</Billboard>
+								</Transform>
+							</transform>
+                                                </transform>
+					</Group>
+                              
+                                    <Viewpoint DEF='Viewpoint-YZ-1' description='Viewpoint-YZ-1' jump='true' fieldOfView='.7854' position='-25 5 4' orientation='0 -1 0 1.571'></viewpoint>
+					<Viewpoint DEF='Viewpoint-XY-1' description='Viewpoint-XY-1' jump='true' fieldOfView='.7854' position='0 5 -15' orientation='0 1 0 3.142'></viewpoint>
+					<Viewpoint DEF='Viewpoint-YZ-2' description='Viewpoint-YZ-2' jump='true' fieldOfView='.7854' position='29 5 4' orientation='0 1 0 1.571'></viewpoint>
+					<Viewpoint DEF='Viewpoint-XY-2' description='Viewpoint-XY-2' jump='true' fieldOfView='.7854' position='0 5 25' orientation='0 0 1 0'></viewpoint>
+					<Viewpoint DEF='Viewpoint-XZ' description='Viewpoint-XZ' jump='true' fieldOfView='.7854' position='0 25 4' orientation='-1 0 0 1.571'></viewpoint>
+				</Transform>
+			</Scene>
+    </x3d>
+  
+    <div id='slidersContainer'>
+        <!-- ============================================================= -->
+        <!-- Spectrum Viewer Controls                                      -->
+        <!-- ============================================================= -->        
+        <div id='settingsDiv' class='settingsDiv' style='display:none; text-align:center;'>
+            <div class="settingsTitleBar">Spectrum Viewer Controls<img id="SVC_CloseBtn" class="closeBtn" src="./myicons/closeBtn.png"></div>
+            <div class="slidersTableContainer">
+                <div class="controlTableRow"></div>
+                <div class="controlTable" > 
+                    <div class="controlTableRow"> 
+                        <div class="controlTableCol1">FREQUENCY:</div>
+                        <div class="controlTableCol2">
+				<input id='f' size='8' value='865' style='text-align:center'> MHz
+                        </div>
+                    </div>
+                    <div class="controlTableRow"> 
+                        <div class="controlTableCol1">BANDWIDTH:</div>
+                        <div class="controlTableCol2">
+			  <input id='b' size='8' value='12' style='text-align:center'> MHz
+                        </div>
+                    </div>
+                    <div class="controlTableRow"> 
+                        <div class="controlTableCol1">BINS:</div>
+                        <div class="controlTableCol2">
+			  <input id='n' size='8' value='256' style='text-align:center'>
+                        </div>
+                    </div>
+                    <div class="controlTableRow"> 
+                        <div class="controlTableCol1">UPDATES/SEC:</div>
+                        <div class="controlTableCol2">
+			  <input id='r' size='8' value='12' style='text-align:center'>
+                        </div>
+                    </div>
+                    <div class="controlTableRow"> 
+                        <div class="controlTableCol1">SWEEPS:</div>
+                        <div class="controlTableCol2">
+			  <input id='s' size='8' value='1' style='text-align:center'>
+                        </div>
+                    </div>                    
+                </div>
+			
+				
+				<div id='scaleSlider'>
+                                    
+					 <div id="scaleSlider" 
+                                              class='sliderDiv' 
+                                              style="margin-top: 10px;"width: 100%;" 
+                                              title='Y-scale for making graph flatter/stretched' >
+						<div class='sliderLabel' style="display: inline-block">Scale</div>
+						<div id="y-scale" class='sliderLabel' style="display: inline-block">1</div> 
+						<div class='sliderLabel' style="display: inline-block">times</div>
+						<br>
+						<div id="slider-y-scale" style="display: block; margin-top: 10px; margin-left: auto; margin-right: auto;">></div>
+					</div>
+					
+					<div id="historySlider"
+                                             class='sliderDiv' 
+                                             style="margin-top: 20px; width: 100%;"
+                                             title='Change history of the graph' >
+						<div class='sliderLabel' style="display: inline-block">History</div>
+						<div id="time-slices" class='sliderLabel' style="display: inline-block">10</div>
+						<div class='sliderLabel' style="display: inline-block">time-slices</div>
+						<br>
+						<div id="slider-time-slices" style="display: block; margin-top: 10px; margin-left: auto; margin-right: auto;">></div>
+						<br>
+					</div>
+				</div>
+            
+			</div>
+             <input id="updateSpectrumViewerControls" 
+                    type="button" 
+                    class="tutorialUpdate_button" 
+                    style="position: absolute; bottom: 5px; left: 70px; display:inline-block;" 
+                    title="click here to update spectrum viewer parameters" 
+                    value="Update" />
+          
+			</div>
+
+
+        
+        <!-- ============================================================= -->
+        <!-- Game Controls                                      -->
+        <!-- ============================================================= -->          
+        <div id='sliderHider' 
+             class="sliderHider" 
+             style='display:none; text-align:center;'>
+            <div class="sliderTitleBar">Game Controls<img id="GC_CloseBtn" class="closeBtn" src="./myicons/closeBtn.png"></div>
+            <div class="slidersTableContainer">
+                                    <div class="controlTableRow">
+                                        <div id="gameControllerNodeDiv">
+                                        </div>
+                    </div>
+                <div class="controlTable" > 
+                    <div class="controlTableRow"> 
+                        <div class="controlTableCol1">MOD:</div>
+		        <div class="controlTableCol2">
+						<select id='mod_ctrl' title="Select a modulation scheme" style='width:100%'>
+                                                  <option value="-1"></option>
+						 <!--  <option value="41">OOK</option> -->
+						 <!--  <option value="39">BPSK</option> -->
+						 <!-- <option selected value="40">QPSK</option> -->
+						 <!-- <option value="3">8PSK</option> -->
+						 <!--  <option value="4">16PSK</option> -->
+						 <!--  <option value="5">32PSK</option> -->
+						 <!-- <option value="6">64PSK</option> -->
+						 <!--  <option value="7">128PSK</option> -->
+						  <option value="25">4QAM</option>					
+						  <option value="26">8QAM</option>
+						  <option value="27">16QAM</option>
+						  <option value="28">32QAM</option>
+						  <option value="29">64QAM</option>
+						 
+                                                 <!-- <option value="17">2ASK</option> -->
+						 <!--  <option value="18">4ASK</option> -->
+						 <!--  <option value="19">8ASK</option> -->
+						 <!--  <option value="20">16ASK</option> -->
+						 <!--  <option value="21">32ASK</option> -->
+						 <!--  <option value="22">64ASK</option> -->
+						 <!--  <option value="23">128ASK</option> -->
+						</select>
+                        </div>
+                    </div>
+                    <div class="controlTableRow"> 
+                        <div class="controlTableCol1">CRC:</div>
+                        <div class="controlTableCol2">
+						<select id='crc_ctrl' title="Select a cyclic redundancy check for packet" style='width:100%'>
+                                                  <option value="-1"></option>
+						  <option value="1">none</option>
+						  <option value="2">checksum</option>
+						  <option value="3">8</option>
+						  <option value="4">16</option>
+						  <option value="5">24</option>
+						  <option selected value="6">32</option>
+						</select> 
+                        </div>
+                    </div>
+                    <div class="controlTableRow"> 
+                        <div class="controlTableCol1">IFEC:</div>
+                        <div class="controlTableCol2">
+						<select id='ifec_ctrl' title="Select an INNER forward error correction scheme" style='width:100%'>
+                                                  <option value="-1"></option>
+						  <option value="1">none</option>
+						  <option value="4">Hamming (7, 4)</option>
+						  <option value="6">Hamming (12, 8)</option>
+						  <option value="7">Golay (24, 12)</option>
+						  <option value="8">SEC-DED (22, 16)</option>
+						  <option value="9">SEC-DED (39, 32)</option>
+						  <option value="10">SEC-DED (72, 64)</option>
+						  
+						  <option value="11">CONV-V27</option>
+						  
+						  <option selected value="12">CONV-V29</option>
+						  <option value="13">CONV-V39</option>
+						  
+						  <option value="14">CONV-V615</option>
+						</select>
+                        </div>
+                    </div>                    
+                    <div class="controlTableRow"> 
+                        <div class="controlTableCol1">OFEC:</div>
+                        <div class="controlTableCol2">
+						<select id='ofec_ctrl' title="Select an OUTER forward error correction scheme" style='width:100%'>
+                                                  <option value="-1"></option>
+						  <option selected value="1">none</option>
+						  <option value="4">Hamming (7, 4)</option>
+						  <option value="6">Hamming (12, 8)</option>
+						  <option value="7">Golay (24, 12)</option>
+						  <option value="8">SEC-DED (22, 16)</option>
+						  <option value="9">SEC-DED (39, 32)</option>
+						  <option value="10">SEC-DED (72, 64)</option>
+						  
+						  <option value="11">CONV-V27</option>
+						  
+						  <option value="12">CONV-V29</option>
+						  <option value="13">CONV-V39</option>
+						  
+						  <option value="14">CONV-V615</option>
+						</select>
+                        </div>
+                    </div>
+                    <div class="controlTableRow"> 
+                        <div class="controlTableCol1">FREQUENCY:</div>
+                        <div class="controlTableCol2">                    
+  			<input id='freq_input' size='8' value='770' style='text-align:center'> MHz
+                        </div>
+                    </div>
+                    <div class="controlTableRow"> 
+                        <div class="controlTableCol1">BANDWIDTH:</div>
+                        <div class="controlTableCol2">                    
+  			<input id='bandwidth_input' size='8' value='1' style='text-align:center'> MHz
+                        </div>
+                    </div>                    
+            </div>
+                
+            <!-- ===================== GAIN CONTROL ============================== -->
+	    <div id="gainSlider" 
+                 class='sliderDiv' 
+                 style="width: 100%;" 
+                 title="Gain. Tx Gain applied to baseband signal before it is sent to USRP in dB. Should always be a float. Any float value is possible but beware that the USRP only accepts sample values between -1.0 and 1.0 so don't make it too large. Currently only applicable when using USRPs.">
+              <div style="margin-top: 5px; height: 64px; vertical-align: middle;">
+                <img id='icon-power' alt="icon for power" width='30' height='40' 
+                     style='display: block; vertical-align: middle; margin: auto' src='myicons/lightning.png' />
+              </div>
+              <div id="amount-power" class='sliderLabel' style="display:inline-block;">20</div>
+	      <div class='sliderLabel' style="display:inline-block;">dB</div>
+	      <div id="slider-power" style="display: block; margin-top: 10px; margin-left: auto; margin-right: auto;"></div>
+	    </div>
+            
+            <!-- ================================================================= -->
+				<div class='sliderDiv' 
+                                     style="display:none;"
+                                     title='Length of payload in bytes.  Can be any non-negative integer (within limits of unsigned int)'>
+					<img id='icon-packet' alt="icon for packet" width='36' height='36' style='display: block; margin-left: auto; margin-right: auto;' src='myicons/packetOld.png'>
+
+						<div id="amount-packet" class='sliderLabel'>25</div>
+						<div class='sliderLabel'>
+							bytes
+						</div>
+
+					<div id="slider-packet" style="display: block; margin-left: auto; margin-right: auto; height:200px;"></div>
+				</div>
+				<div class='sliderDiv' 
+                                     style="display:none;" 
+                                     title='Delay between sending of each frame. In miliseconds. Must be an int.'>
+					<img id='icon-delay' alt="icon for delay" width='30' height='40' style='display: block; margin-left: auto; margin-right: auto;' src='myicons/delay.png'>
+						<div id="amount-delay" class='sliderLabel'>1000</div>
+						<div class='sliderLabel'>
+							milisec
+						</div>
+
+					<div id="slider-delay" style="display: block; margin-left: auto; margin-right: auto; height:200px;"></div>
+					
+				</div>
+            
+             <input id="updateGameControls" 
+                    type="button" 
+                    class="tutorialUpdate_button" 
+                    onclick="UpdateGameControllerModel(); LaunchTutorial();"
+                    style="position: absolute; bottom: 5px; left: 70px; display:inline-block;" 
+                    title="click here to update game parameters" 
+                    value="Update" />
+          
+			</div>
+        </div>
+                </div>
+			
+			
+		<div id='scoreArea' title="Score" style='display:none; margin-top:20px;'>
+		  <div style="border:0; color:#f6931f; font-size:32px; font-weight:bold; display:inline-block" id='scoreDiv'>0000</div>
+                  <img alt="" style='vertical-align: sub;' src='Coin.png' width='36' height='36' />
+                </div>
+
+<!--  ============================================================================
+//  BEGIN.  Tool Bar / Menu 
+// ============================================================================-->
+		<div class="overlayButton">
+                    <div class="helpButtonContainer">
+                        <button id="help_button" class="right_button" title='Help'>?</button>
+                    </div>                    
+                    <div id="speedButtonContainer" class="speedButtonContainer" style="display:none;">
+			<button id='transmit_button' class='right_button' disabled='disabled' title="Transmit" style='display:none'>
+				<img alt="" src='transmitOff.gif' width='32' height='32' style='margin:-7px'>
+			</button>
+			<button id='rand_button' class='right_button' style='display:none' title="Toggle real/random spectal data">
+				<img alt="" src='RandOff.gif' width='38' height='38' >
+			</button>
+			<button id='settings_button' class='right_button' title="Set center frequency, bandwidth, and the number of FFT bins">
+				<img alt="" src='myicons/settings.png' width='38' height='38' >
+			</button>
+			<button id='waterfall_button' class='right_button' title="Visualize spectrum using a waterfall heatmap plot">
+				<img alt="" src='waterfall.png' width='38' height='38' >
+			</button>
+			<button id='graph_button' class='right_button' title="Visualize spectrum using a line graph">
+				<img alt="" src='graph4.gif' width='38' height='38' >
+			</button>
+			<button id='users_button' class='right_button' title="Display the Users">
+				<img alt="" src='myicons/users.gif' width='38' height='38' style='margin:-10px'>
+			</button>
+			<button id='metrics_button' class='right_button' title="Performance metrics">
+				<img alt="" src='myicons/metrics.png' width='38' height='38' style='margin:-10px;'>
+			</button>
+                    </div>
+                    <div id="speedButtonContainer2" class="speedButtonContainer2" style="display:none;">
+                        <button id='game_button' class='right_button' title="Show/hide game controls">
+				<img alt="" src='myicons/GameControllerOff.png' style="width:38px; height:38px;">
+			</button>
+                    </div>
+                   <div id="tutorialButtonContainer" class="tutorialButtonContainer" style="display:none">
+                       			
+			<div style="background-color: white; display:inline; font-size:16px; padding: 10px; display:none; ">
+				<input type="checkbox" id="slow_conn_checkbox" name="slow_connections" value="slow_connections" style="width:20px; height:20px; vertical-align:middle;">
+				<label for="slow_conn_checkbox" style="vertical-align:middle;">Remove 3D drawing</label>
+			</div>
+			&nbsp;
+                        <!--  =============================================================================================        --> 
+			<!-- <div style="background-color: white; display:inline; font-size:16px; padding: 10px; display: none;">  -->
+			<!-- 	<label for="tx_node_crts" style="vertical-align:middle;">Transmitter node for CRTS</label>         -->
+			<!-- 	<select id='tx_node_crts_options' title="Select a transmitter node for CRTS"></select>             -->
+			<!-- </div>                                                                                                -->
+			<!-- &nbsp;                                                                                                -->
+			<!-- <div style="background-color: white; display:inline; font-size:16px; padding: 10px; display: none;">  -->
+			<!-- 	<label for="rx_node_crts" style="vertical-align:middle;">Receiver node for CRTS</label>            -->
+			<!--	<select id='rx_node_crts_options' title="Select a receiver node for CRTS" ></select>               --> 
+			<!-- </div>                                                                                                -->
+			<!--  =============================================================================================        --> 
+			<button id="launch_crts_button"
+				class="tutorial_button"
+				style="display:none"
+                                title="Click here to launch the CRTS demo">
+                            Launch CRTS Demo
+                        </button>
+                        <input id="launch_tutorials" type="button" 
+                               class="tutorial_button" 
+                               title="click here to launch a tutorial" 
+				style="display:none"
+                               value="Tutorials" />
+                        <input id="launch_scoreboard" type="button" 
+                               onclick="spectrum.launchScoreboard();"                               
+                               class="scoreboard_button" 
+                               title="click here to launch the scoreboard"
+                               value="Scoreboard" />                        
+                        <input id="exitTutorialBtn" type="button" 
+                               onclick="corStatus.showFloors();"
+                               class="exit_button" 
+                               title="click here to exit a tutorial" value="Exit" />
+                        <div style="background-color: #A9A9A9; display:inline; font-size:12px; padding: 10px;">
+                        <label for="throughput_checkbox" style="vertical-align:middle;">Throughput graphs</label>
+                        <input type="checkbox" id="launch_Throughput_graphs" name="Throughput_graphs" value="Throughput_graphs" style="width:20px; height:20px; vertical-align:middle;">
+			
+                        </div>	
+
+                                 </div>
+                    
+
+
+                                
+		
+                    <div class="fullScreenButtonContainer">
+		      <button id='fullscr_button' class="left_button" onclick="corStatus.goFullscreen();" title="Fullscreen">
+			  <img alt="" src='full-screen.gif' width='24' height='24' style='margin-top:2px;' />
+		      </button>
+                    </div>
+                </div>
+<!-- ============================================================================
+//  END.  Tool Bar / Menu 
+// ============================================================================ -->
+
+                <div id='statusBox' style="z-index: 20; background-color: red;">
+			Status: OK
+		</div>
+			
+		<div id="graph_dialog" class="window_div" title="Please select a node for real-time spectrum sensing" style='margin-top:2px;padding:0px'>
+			<canvas id='cvs' style="z-index: 0;"></canvas>
+ 			<canvas id="layer2" style="z-index: 200; cursor:crosshair;"></canvas>
+		</div>
+		<div id="metrics_dialog" class="window_div" title="Simulated Performance Metrics" style='margin-top:2px;padding:0px'>
+			<table class='table1' id='metrics_table'>
+				
+			</table>
+		</div>
+		<div id="waterfall_dialog" class="window_div" title="Please select a node for real-time spectrum sensing" style='margin-top:2px;padding:0px'>
+			<div id="heatmapArea" style='width:100%;height:100%'></div>
+		</div>
+		<div id="help_dialog" class="window_div" title="Help">
+			<div class="section" id="camera-navigation">
+				<h1>Spectral Games</h1>
+				<h3><em>Powered by CRTS, Cognitive Radio Test System</em></h3>
+				<ol class="simple">
+					<li>Select node</li>
+					<li>Optional:  change spectrum sensing parameters</li>
+					<li>Click line graph button</li>
+					<li>Drag to select band</li>
+					<li>Click game button</li>
+					<li>Click transmit button</li>
+					<li>Click metrics button</li>
+					<li>If desired, click transmit button to stop transmitting, change transmission parameters, click transmit button again to restart</li>
+				</ol>
+				<h1>Node Color Legend</h1>
+				<p>Green:  uhd_find_devices succeeds on the node.  This implies that the software radio functions.</p>
+				<p>Olive:  uhd_find_devices fails on the node.  This implies that the software radio does not function.</p>
+				<p>Red:  node cannot be reached over SSH.</p>
+				<h1>Spectrum Sensing</h1>
+				<p>Settings can be adjusted by clicking on the gear icon.</p>
+				<p>Clicking a green node starts specrum sensing and visualization.</p>
+				<h1>Camera Navigation</h1>
+				<p>X3DOM provides some generic interaction and navigation methods. Interactive objects will be handled by HTML-like
+					events. Navigation can be user-defined or controlled by specific predefined modes.</p>
+				<p>Currently X3DOM supports the following interactive navigation modes:</p>
+				<ul class="simple">
+					<li>Examine</li>
+					<li>Walk</li>
+					<li>Fly</li>
+					<li>Look-at</li>
+					<li>Look-around</li>
+					<li>Game</li>
+					<li>Helicopter</li>
+				</ul>
+				<p>Non-Interactive movement encompasses the functionality of:</p>
+				<ul class="simple">
+					<li>Resetting a view</li>
+					<li>Showing all</li>
+					<li>Upright view</li>
+				</ul>
+				<div class="section" id="interactive-camera-movement">
+					<h2>Interactive camera movement</h2>
+					<h3>Examine</h3>
+					<p>Activate this mode by pressing the <span class="docutils literal"><span class="pre">&quot;e&quot;</span></span> key.</p>
+					<table
+					class='gradient-table'>
+						<colgroup>
+							<col width="44%" />
+							<col width="56%" />
+						</colgroup>
+						<thead valign="bottom">
+							<tr>
+								<th class="head">Function</th>
+								<th class="head">Mouse Button</th>
+							</tr>
+						</thead>
+						<tbody valign="top">
+							<tr>
+								<td>Rotate</td>
+								<td>Left / Left + Shift</td>
+							</tr>
+							<tr>
+								<td>Pan</td>
+								<td>Mid / Left + Ctrl</td>
+							</tr>
+							<tr>
+								<td>Zoom</td>
+								<td>Right / Wheel / Left + Alt</td>
+							</tr>
+							<tr>
+								<td>Set center of rotation</td>
+								<td>Double-click left</td>
+							</tr>
+						</tbody>
+						</table>
+						<h3>Walk</h3>
+						<p>Activate this mode by pressing the <tt class="docutils literal"><span class="pre">&quot;w&quot;</span></tt> key.</p>
+						<table
+						class='gradient-table'>
+							<colgroup>
+								<col width="44%" />
+								<col width="56%" />
+							</colgroup>
+							<thead valign="bottom">
+								<tr>
+									<th class="head">Function</th>
+									<th class="head">Mouse Button</th>
+								</tr>
+							</thead>
+							<tbody valign="top">
+								<tr>
+									<td>Move forward</td>
+									<td>Left</td>
+								</tr>
+								<tr>
+									<td>Move backward</td>
+									<td>Right</td>
+								</tr>
+							</tbody>
+							</table>
+							<div class="section" id="fly">
+								<h3>Fly</h3>
+								<p>Activate this mode by pressing the <tt class="docutils literal"><span class="pre">&quot;f&quot;</span></tt> key.</p>
+								<table
+								class='gradient-table'>
+									<colgroup>
+										<col width="44%" />
+										<col width="56%" />
+									</colgroup>
+									<thead valign="bottom">
+										<tr>
+											<th class="head">Function</th>
+											<th class="head">Mouse Button</th>
+										</tr>
+									</thead>
+									<tbody valign="top">
+										<tr>
+											<td>Move forward</td>
+											<td>Left</td>
+										</tr>
+										<tr>
+											<td>Move backward</td>
+											<td>Right</td>
+										</tr>
+									</tbody>
+									</table>
+							</div>
+							<div class="section" id="helicopter">
+								<h3>Helicopter</h3>
+								<p>Activate this mode by pressing the <tt class="docutils literal"><span class="pre">&quot;h&quot;</span></tt> key.</p>
+								<p>To look downwards/upwards and to move higher/lower use the keys (8/9 and 6/7).</p>
+								<table class='gradient-table'>
+									<colgroup>
+										<col width="44%" />
+										<col width="56%" />
+									</colgroup>
+									<thead valign="bottom">
+										<tr>
+											<th class="head">Function</th>
+											<th class="head">Mouse Button</th>
+										</tr>
+									</thead>
+									<tbody valign="top">
+										<tr>
+											<td>Move forward</td>
+											<td>Left</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							<div class="section" id="look-at">
+								<h3>Look at</h3>
+								<p>Activate this mode by pressing the <tt class="docutils literal"><span class="pre">&quot;l&quot;</span></tt> key.</p>
+								<table
+								class='gradient-table'>
+									<colgroup>
+										<col width="44%" />
+										<col width="56%" />
+									</colgroup>
+									<thead valign="bottom">
+										<tr>
+											<th class="head">Function</th>
+											<th class="head">Mouse Button</th>
+										</tr>
+									</thead>
+									<tbody valign="top">
+										<tr>
+											<td>Move in</td>
+											<td>Left</td>
+										</tr>
+										<tr>
+											<td>Move out</td>
+											<td>Right</td>
+										</tr>
+									</tbody>
+									</table>
+							</div>
+							<div class="section" id="game">
+								<h3>Game</h3>
+								<p>Activate this mode by pressing the <tt class="docutils literal"><span class="pre">&quot;g&quot;</span></tt> key.</p>
+								<p>To look around (rotate view) move the mouse.</p>
+								<table class='gradient-table'>
+									<colgroup>
+										<col width="44%" />
+										<col width="56%" />
+									</colgroup>
+									<thead valign="bottom">
+										<tr>
+											<th class="head">Function</th>
+											<th class="head">Key</th>
+										</tr>
+									</thead>
+									<tbody valign="top">
+										<tr>
+											<td>Move forward</td>
+											<td>Cursor up</td>
+										</tr>
+										<tr>
+											<td>Move backward</td>
+											<td>Cursor down</td>
+										</tr>
+										<tr>
+											<td>Strafe Left</td>
+											<td>Cursor left</td>
+										</tr>
+										<tr>
+											<td>Strafe Right</td>
+											<td>Cursor right</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+				</div>
+				<div class="section" id="non-interactive-camera-movement">
+					<h2>Non-interactive camera movement</h2>
+					<table class='gradient-table'>
+						<colgroup>
+							<col width="44%" />
+							<col width="56%" />
+						</colgroup>
+						<thead valign="bottom">
+							<tr>
+								<th class="head">Function</th>
+								<th class="head">Key</th>
+							</tr>
+						</thead>
+						<tbody valign="top">
+							<tr>
+								<td>Reset view</td>
+								<td>r</td>
+							</tr>
+							<tr>
+								<td>Show all</td>
+								<td>a</td>
+							</tr>
+							<tr>
+								<td>Upright</td>
+								<td>u</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+<!-- ================================================================= -->
+<!--the following divs are used for the throughput graph -->
+ <div id="container">  
+      <div id="containera">
+          <div id="left" title="node_0"></div>
+          <div id="right" title="node_1"></div>
+      </div>
+      <div id="containerb">
+          <div id="leftb" title="node_2"></div>
+          <div id="rightb" title="node_3"></div>
+      </div>
+ </div>
+<div id="Teams_container">
+          <div id="leftt" title="team A"></div>
+          <div id="rightt" title="team B"></div>
+          <div id="leftb_team" title="teams A & B"></div>
+          <div id="rightb_team" title="teams A & B Scores"></div>
+          </div>
+</div>
+<!-- ================================================================= -->
+<!--  HTML below is used for the Tutorial Module                       -->
+<!--  Each div Represents a pop dialog window                          -->
+<!-- ================================================================= -->
+  <div id="FatalErrorPopUp" style="text-align: left; display:none;">
+      <h3>An error has occurred in the Tutorial module</h3>
+      <div id="errorMsg">
+      </div>
+  </div>
+  <div id="SelectTutorialPopUp" style="text-align: center; display:none;">
+    <div class="tutorialContainer">    
+      <h3 style="text-align: left;">Step 1.  Select A Tutorial</h3>
+      <i>Please select a tutorial from the list below</i>
+     <div id="tutorialList" style="margin:auto;">
+     </div>
+    </div>      
+  </div>
+  <div id="DisplayTutorialDescriptionPopUp" style="text-align: center; display:none;">
+      <div class="tutorialContainer">
+        <h3 style="text-align: left;">Step 2.  Tutorial Description</h3>
+        <div id="theTutorialDescription" ></div>
+        <div id="descSlideControlBar" >
+            <button id="prevBtn" class="descSlideButton" onclick="DisplayPrevDescSlide();">prev</button>
+            <div id="SlideCounterText">Description slide x of y</div>
+            <button id="nextBtn" class="descSlideButton" onclick="DisplayNextDescSlide();">next</button>
+        </div>
+        <button id="continueToNodeSelection" class="continueButton" onclick="SelectANode();" style="visibility: hidden;">continue to node selection</button>
+        <div style="clear:both;"></div>
+      </div>
+  </div>
+  <div id="SelectTutorialNodes" style="text-align: center; display:none;">
+    <div class="tutorialContainer">
+      <h3 style="text-align: left;">Step 3.  Tutorial Node Association</h3> 
+      <button id="rescanNodesBtn"  
+              class="continueButton" 
+              style="margin-bottom: 20px;"
+              onclick="RescanNodes();">Re-scan nodes for availability</button>
+      <div id="displayLoading" class="displayLoading" style="display:none">
+          Loading...please be patient<br />
+          <img src="./myicons/loading_spinner.gif" style="width: 75px; height: 75px;" alt="loading" /> 
+      </div>
+      <div id="selectNodeTable" class="selectNodeTable">
+        <div id="SelectTransmitterNodes" class="nodeList">
+        </div>
+        <div id="SelectReceiverNodes" class="nodeList">
+        </div>
+        <div id="SelectTransceiverNodes" class="nodeList">
+        </div>
+        <div id="SelectInterfererNodes" class="nodeList">
+        </div>
+      </div>
+      <button style="display:none;" id="continueToSubmission"  class="continueButton" onclick="LaunchTutorial();">launch the tutorial</button>
+    </div>
+  </div>
+<!-- ================================================================= -->
+<!-- ================================================================= -->
+        <!-- ============================================================= -->
+        <!--  Performance metrics                                          -->
+        <!-- ============================================================= -->
+        <div id="performanceMetricDiv" class="performanceMetricDiv" style="display:none;"/>
+          <div class="PM_Title">Performance Metrics<img
+              id="PM_CloseBtn" class="closeBtn" src="./myicons/closeBtn.png"></div>
+
+
+          
+        </div>
+  </body>
+</html>

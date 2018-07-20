@@ -1,0 +1,169 @@
+#!/usr/bin/env python
+##################################################
+# Gnuradio Python Flow Graph
+# Title: Spectrum Sensing Nikita
+# Generated: Wed Feb 26 12:29:17 2014
+##################################################
+
+from gnuradio import blocks
+from gnuradio import eng_notation
+from gnuradio import fft
+from gnuradio import gr
+from gnuradio import uhd
+from gnuradio.eng_option import eng_option
+from gnuradio.fft import window
+from gnuradio.filter import firdes
+from optparse import OptionParser
+
+import time
+import argparse
+import netifaces as ni
+import thread
+from socket import *
+
+class spectrum_sensing_nikita(gr.top_block):
+
+    def __init__(self, center_freq, bins, bandwidth):
+        gr.top_block.__init__(self, "Spectrum Sensing Nikita")
+
+        ##################################################
+        # Variables
+        ##################################################
+        self.samp_rate = samp_rate = bandwidth
+        self.center_freq = center_freq
+        self.bins = bins
+        self.bandwidth = bandwidth
+
+        ##################################################
+        # Blocks
+        ##################################################
+        self.uhd_usrp_source_0 = uhd.usrp_source(
+        	device_addr="",
+        	stream_args=uhd.stream_args(
+        		cpu_format="fc32",
+        		channels=range(1),
+        	),
+        )
+        self.uhd_usrp_source_0.set_samp_rate(samp_rate)
+        self.uhd_usrp_source_0.set_center_freq(center_freq, 0)
+        self.uhd_usrp_source_0.set_gain(20, 0)
+        self.uhd_usrp_source_0.set_bandwidth(bandwidth, 0)
+        self.fft_vxx_0 = fft.fft_vcc(bins, True, (window.blackmanharris(bins)), True, 1)
+        self.blocks_stream_to_vector_0 = blocks.stream_to_vector(gr.sizeof_gr_complex*1, bins)
+        self.blocks_probe_signal_vx_0 = blocks.probe_signal_vf(bins)
+        self.blocks_complex_to_mag_0 = blocks.complex_to_mag(bins)
+
+        ##################################################
+        # Connections
+        ##################################################
+        self.connect((self.uhd_usrp_source_0, 0), (self.blocks_stream_to_vector_0, 0))
+        self.connect((self.blocks_stream_to_vector_0, 0), (self.fft_vxx_0, 0))
+        self.connect((self.fft_vxx_0, 0), (self.blocks_complex_to_mag_0, 0))
+        self.connect((self.blocks_complex_to_mag_0, 0), (self.blocks_probe_signal_vx_0, 0))
+
+
+# QT sink close method reimplementation
+
+    def get_samp_rate(self):
+        return self.samp_rate
+
+    def set_samp_rate(self, samp_rate):
+        self.samp_rate = samp_rate
+        self.uhd_usrp_source_0.set_samp_rate(self.samp_rate)
+
+    def get_center_freq(self):
+        return self.center_freq
+
+    def set_center_freq(self, center_freq):
+        self.center_freq = center_freq
+        self.uhd_usrp_source_0.set_center_freq(self.center_freq, 0)
+
+    def get_bins(self):
+        return self.bins
+
+    def set_bins(self, bins):
+        self.bins = bins
+
+    def get_bandwidth(self):
+        return self.bandwidth
+
+    def set_bandwidth(self, bandwidth):
+        self.bandwidth = bandwidth
+        self.uhd_usrp_source_0.set_bandwidth(self.bandwidth, 0)
+
+
+    
+parser = argparse.ArgumentParser(description='Spectrum sensing script.  Replace the CAPITALIZED words with input values')
+parser.add_argument('-f','--center_frequency', help='Center frequnecy', required=True)
+parser.add_argument('-b','--bandwidth', help='Bandwidth, not to exceed 20 MHz', required=True)
+parser.add_argument('-n','--bins', help='Number of FFT bins.  More for higher accuracy', required=True)
+parser.add_argument('-r','--rate', help='Number of times per second the data is sent', required=True)
+parser.add_argument('-p','--port', help='Server port', required=True)
+
+
+def CORNET_3D_Daemon(tcpTimeClientSock, addr):
+    args = vars(parser.parse_args())
+
+    tb = spectrum_sensing_nikita(float(args['center_frequency']), int(float(args['bins'])), float(args['bandwidth']))
+    period=1/2.0
+    spectrumStarted = False
+    while True: 
+        try:
+            data = tcpTimeClientSock.recv(BUFSIZE)
+            params = dict()
+            print data
+            if data.startswith('PARAMS'):
+                tokens = data.strip().split('--')
+                parameters = tokens[1].split(' ')
+                print parameters
+                for parameter in parameters:
+                    key,value = parameter.split(':')
+                    params[key] = value
+                    print key + '->' + params[key]
+                tb = spectrum_sensing_nikita(float(params['f']), int(float(params['n'])), float(params['b']))
+                period = 1/float(params['r'])
+                spectrumStarted = True
+                tb.start()
+                time.sleep(period)
+                tcpTimeClientSock.send('%s' % list(tb.blocks_probe_signal_vx_0.level()))
+            elif data.find('spectrum') >= 0 and data.find('exit') == -1:
+                time.sleep(period)
+                tcpTimeClientSock.send('%s' % list(tb.blocks_probe_signal_vx_0.level()))
+            elif data.find('exit') >= 0 or not data:
+                print 'Sending exit'
+                tb.stop()
+                print 'Exited from the spectrum sensing'
+                tcpTimeClientSock.close()
+	        tb.wait()
+                time.sleep(period)
+                break
+        except Exception as inst:
+            print inst
+            tb.stop()
+            tcpTimeClientSock.close()
+            tb.wait()
+            time.sleep(period)
+            break
+
+if __name__ == '__main__':
+    ni.ifaddresses('eth0')
+    HOST = ni.ifaddresses('eth0')[2][0]['addr']
+    BUFSIZE = 50
+    args = vars(parser.parse_args())
+    ADDR = (HOST, int(args['port']))
+
+    tcpTimeSrvrSock = socket(AF_INET,SOCK_STREAM)
+    tcpTimeSrvrSock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+    tcpTimeSrvrSock.bind(ADDR)
+    tcpTimeSrvrSock.listen(5)
+
+    while True:
+        try:
+            print 'Waiting for connection on port: ' + args['port']
+            tcpTimeClientSock, addr = tcpTimeSrvrSock.accept()
+            print 'Connected from: ', addr
+            CORNET_3D_Daemon(tcpTimeClientSock, addr)
+            #thread.start_new_thread(CORNET_3D_Daemon, (tcpTimeClientSock, addr))
+        except Exception as inst:
+            print inst
+    tcpTimeSrvrSock.close() 

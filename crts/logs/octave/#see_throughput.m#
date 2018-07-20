@@ -1,0 +1,36 @@
+clc, close all,
+
+
+basic_two_node_network_node_1_cognitive_radio_net_rx;
+
+ plot_cognitive_radio_net_rx;
+ 
+ clear;
+
+basic_two_node_network_node_2_cognitive_radio_net_rx;
+
+ plot_cognitive_radio_net_rx;
+ 
+% clear;
+%
+%basic_two_node_network_node_3_cognitive_radio_net_rx;
+%
+% plot_cognitive_radio_net_rx;
+% 
+% clear;
+%
+%basic_two_node_network_node_4_cognitive_radio_net_rx;
+%
+% plot_cognitive_radio_net_rx;
+ 
+ 
+ 
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,719 @@
+#!/usr/bin/env python
+
+# To see the output as it is printed:
+#
+#     PYTHONUNBUFFERED=1 ./thisfile | tee logs/log
+#
+
+##############################################
+# LIBRARIES IMPORT
+##############################################
+
+import sys
+
+# 'Flask' libraries for web socket programming with the client/web-browser
+from flask import Flask, render_template, request, send_from_directory
+from flask.ext.socketio import SocketIO, emit
+from flask_socketio import join_room, leave_room
+import flask
+
+# Library for SSH
+import pxssh
+
+# Library for TCP socket connection
+from socket import *
+import socket
+import select
+
+# Library for Cross origin and for having server available to all the browsers
+from flask.ext.cors import CORS, cross_origin
+
+# Library for sleep
+import time
+
+# Library for creating and handling non-blocking threads
+import threading
+import thread
+
+# Library for running UNIX commands
+import os
+
+import struct
+
+from optparse import OptionParser
+
+from time import gmtime, strftime
+##############################################
+# INITIALIZATIONS AND DECLARATIONS
+##############################################
+import inspect
+def LINE():
+    try:
+        raise Exception
+    except:
+        return 'line:' + str(sys.exc_info()[2].tb_frame.f_back.f_lineno) + ':'
+
+
+noOfNodes = 58
+# Initialize all the TCP sockets
+tcpClientSockets = dict()
+for i in range(noOfNodes):
+    tcpClientSockets[i] = socket.socket()
+
+
+# Port numbers used
+crtsTxPort 	= 6008
+crtsRxPort 	= 6018
+tcpSpectrumPort = 5023
+
+# Buffer sizes for the TCP communication
+bufferSizeRecPacket 	= 102400
+bufferSizeCrtsPacket 	= 30
+
+# Flags for getting CRTS connections
+crtsLaunched = dict()
+for i in range(noOfNodes):
+    crtsLaunched[i] = False
+
+#Dictionaries for handling sockets to crts scenario controller
+crtsControllerSockets = dict()
+crtsControllerConnected = dict()
+shutdown = dict()
+
+#Global used to close scoreboard connections
+scoreboardConnected = False
+
+#initialize crts connections
+for i in range(noOfNodes + 10):
+    crtsControllerSockets[i]= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    crtsControllerConnected[i] = False
+    shutdown[i] = False
+socket_listener_threads = dict()
+feedback_threads = dict()
+scoreboard_threads = dict()
+
+#initialize scoreboard connection
+scoreboardConnection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+# Node IP address format and the range of nodes
+# The nodes have IP addresses from 192.168.1.11 to 192.168.1.58
+nodeIPAddress	= "192.168.1."
+startNode 	= 11
+endNode 	= 58
+
+# List of clients connected
+clients = []
+
+# Map of sockets to nodes for which the spectrum is sensed
+socketsToNodesMap = dict()
+
+##############################################
+# FLASK SERVER CONFIGURATIONS
+##############################################
+
+# Configure the Flask server
+app = Flask(__name__, static_url_path='')
+app.config["SECRET_KEY"] = "secret!"
+
+# Change the configuration such that requests from external IP addresses are accepted
+cors = CORS(app, resources={r"/foo": {"origins": "*"}})
+app.config["CORS_HEADERS"] = "Content-Type"
+
+# Debug statements readable from the log file
+app.debug = True
+
+socketio = SocketIO(app)
+
+# flask BUG:
+# this will not work unless the directory is named static
+@app.route('/<path:filename>', methods=["GET"])
+#@cross_origin(origin='*',headers=['Content-Type','Authorization'])
+def static_file(filename):
+    return send_from_directory("static", filename)
+
+# flask BUG:
+# this will not work unless the directory is named static
+@app.route('/')
+def index():
+  return send_from_directory("static", 'index.html')
+
+
+#####################################
+# Non-blocking threads
+#####################################
+
+# Non-blocking thread for receiving spectrum data from the TCP connection
+def tcpCommunicationSpectrum(nodeID):
+    print 'Launching Spectrum for nodeID:', nodeID
+    nodeIPv4Address = nodeIPAddress + str(nodeID)
+    try:
+        while True:
+            spectrumData = tcpClientSockets[nodeID].recv(bufferSizeRecPacket)
+            tcpClientSockets[nodeID].send('spectrum..........................................')
+            room = getRoom(nodeID)
+            socketio.emit('time', spectrumData, room=room)
+    except Exception as e:
+        pass
+
+
+# non-blocking thread that receives data from the crts controllea
+# no longer used for CORNET-3D
+def receiveDataFromCRTSController(nodeID):
+    try:
+        room = getRoom(nodeID)
+        socketio. emit('crtsLaunchResponse', 'OK',room=room)
+        while shutdown[nodeID] == False:
+            receivedData = crtsControllerSockets[nodeID].recv(50)
+            if not receivedData:
+                break
+            else:
+                unpacked = struct.unpack('=iiff', receivedData)
+                #unpacked[0] will hold the type of feedback
+                #0 = packet error rate
+                #socketio.emit('updatePerMetric', str(unpacked[2]), room=room)
+                if unpacked[0] == 0:
+                    socketio.emit('updatePerMetric', str(unpacked[2]), room=room)
+                    socketio.emit('updateThroughputMetric', str(unpacked[3]), room=room)
+        print 'Shutting down receive thread for node', nodeID
+    except Exception as e:
+        print "exception receiving data from CRTS controller:", e
+
+
+# Function used to create the initial network connection between  this backend and 
+# the CRTS scenario controller. 
+crtsInitialSocket = 0
+crtsInitialSocketConnected = False
+def createSocketToController(nodeID, port):
+    global crtsInitialSocket
+    global crtsInitialSocketConnected
+    # This server on this port talks to crts_controller with
+    # scenario_controllers module SC_CORNET.cpp
+    try: #Create the first socket after the backend is started 
+        if crtsInitialSocketConnected == False:
+            print 'creating initial socket'
+            crtsInitialSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            try:
+                crtsInitialSocket.bind(('', port))
+                crtsInitialSocket.listen(5)
+            except Exception as e:
+                print 'exception binding or listening', e
+            #Once the first socket is made, set crtsInitialSocketConnected to true
+            #so we  don't try to recreate it. Just use it to create more sockets
+            #for individual experiments (below)  
+            crtsInitialSocketConnected = True
+        else:
+            print 'initial socket already created'
+            
+        read_list = [crtsInitialSocket]
+        print LINE(), 'socket created, waiting to accept on port:', str(port)
+        while True:
+            readable, writable, errored = select.select(read_list, [], [], .5)
+            for s in readable:
+                if s is crtsInitialSocket:
+                    crtsControllerSockets[nodeID], addr = s.accept()
+                    print 'Connection established with node', addr
+                    crtsControllerConnected[nodeID] = True
+                    return
+    except Exception as e:
+        print 'Error accepting connection from controller: ', e
+
+
+def getRoom(nodeID):
+	return "spectrum-" + str(nodeID)
+
+#####################################
+# SOCKET.IO EVENT DEFINITIONS
+#####################################
+
+# Socket.io event handling for spectrum data
+# The web browser emits the initialization parameters along with the message "nodeID"
+@socketio.on('nodeID')
+def startSpectrum(initParams):
+    # Extract the transParams
+    transParams = initParams['transParams']	
+    nodeID = initParams['nodeID']
+
+    # Add the client to the list of clients
+    current_client_id = request.environ['REMOTE_ADDR']
+    # Get the IPv4 address for the node
+    nodeIPv4Address = nodeIPAddress + str(nodeID)
+
+    print '\n**************************************'
+    print time.strftime('%x %X')
+    print 'Attempting to connect to', nodeIPv4Address + ':' + str(tcpSpectrumPort)
+    
+    # Update the sockets to nodes mapping
+    socketsToNodesMap[request.namespace.socket.sessid] = nodeID
+    
+    
+    # Validate the IPv4 Address
+    try:
+        validate = CORNET_3D_ValidateParameters()
+        if validate.isIPv4AddressValid(nodeIPv4Address):
+            # If parameters are valid in the IPv4 address
+            if validate.isParamsValid(transParams):
+                try:
+                    tcpClientSockets[nodeID].close()
+                    spectrumParams = "PARAMS--f:" + str(transParams['f']) + " b:" + str(transParams['b']) + " n:" + str(transParams['n']) + " r:" + str(transParams['r'])
+                    try:
+                        reconnect = False
+                        tcpClientSockets[nodeID] = socket.socket()
+                        try:
+                            tcpClientSockets[nodeID].connect((nodeIPv4Address, tcpSpectrumPort))
+                        #If an exception is caught, the spectrum sensing script probably died. 
+                        #ssh to the node and restart it
+                        except Exception as e:
+                            reconnect = True
+                            restart_spectrum_sensing(nodeIPv4Address)
+                        
+                        if reconnect == True:
+                            tcpClientSockets[nodeID] = socket.socket()
+                            tcpClientSockets[nodeID].connect((nodeIPv4Address, tcpSpectrumPort))
+                        
+                        clients.append((current_client_id, nodeID))
+                        
+                        print "Connected " + current_client_id + " to the node " + nodeIPv4Address
+                        print "Initialization parameters for starting spectrum"
+                        print "Center frequency: ",str(transParams['f'])
+                        print "Bandwidth: ",str(transParams['b'])
+                        
+                        tcpClientSockets[nodeID].send(spectrumParams)
+                        
+                        join_room(getRoom(nodeID))
+                        t = threading.Thread(target=tcpCommunicationSpectrum, args=(nodeID, ))
+                        t.start()
+                    except Exception as e:
+                            print "There was a problem connecting to the spectrum sensing script on node", nodeIPv4Address
+                except Exception as e:
+                        print "Exception caused in Validate -- Start spectrum for node ", nodeIPv4Address
+                        print "Error: ", e
+            else:
+                    emit('error', 'Invalid parameters for the node: '+ nodeIPv4Address)
+        else:
+                emit('error','Invalid IP address for the node: '+ nodeIPv4Address)
+    except Exception as e:
+            print "Exception caused in Start Spectrum for node ", nodeIPv4Address
+            print "Error: ", e
+
+#Restarts the spectrum sensing script on a node in case it goes down for some reason
+def restart_spectrum_sensing(nodeIP):
+    print 'restarting spectrum_sensing on node:' + str(nodeIP)
+    # TODO: Remove the use of this hard coded path piece: /git/old_cornet3d/
+    run = 'nohup /users/' +\
+        os.environ['USER'] + '/git/old_cornet3d/spectrumSensing' +\
+        ' -f 751000000 -b 12000000 -n 256 -r 2 -p ' +\
+        str(tcpSpectrumPort) +\
+        ' >/dev/null 2>&1 &'
+    print run
+    p = pxssh.pxssh()
+    try:
+        p.login(nodeIP, os.environ['USER'], '')
+        p.sendline(run)
+        p.prompt()
+        p.logout()
+        time.sleep(1)
+    except Exception as e:
+        print "Exception:", e
+
+
+# Socket.io event handling for getting metrics
+@socketio.on('getMetrics')
+def getMetrics(message):
+	# TODO: Get metrics to be implemented
+	print 'Get metrics'
+
+# Socket.io event handling for closing the spectrum
+@socketio.on('closeSSH')
+def closeSSH(nodeID):
+        global scoreboardConnected
+        scoreboardConnected = False
+	closeTCPConnection(int(nodeID))
+
+# Socket.io event for disconnection/Browser window close while the spectrum data transfer is in progress
+@socketio.on('disconnect')
+def disconnect():
+        global scoreboardConnected
+        scoreboardConnected = False
+	if request.namespace.socket.sessid in socketsToNodesMap.keys():
+		nodeID = socketsToNodesMap[request.namespace.socket.sessid]
+		closeTCPConnection(nodeID)
+
+# Closing TCP Connection between the web server and nodeID
+def closeTCPConnection(nodeID):
+    nodeIPv4Address = nodeIPAddress + str(nodeID)
+    room		= getRoom(nodeID)
+    #################################################################
+    # Close the socket connections that are related to spectrum data
+    #################################################################
+    try:		
+        current_client_id = request.environ['REMOTE_ADDR']
+        if (current_client_id, nodeID) in clients:
+            print 'Disconnecting the client ' + current_client_id + ' that is connected to the node ' + nodeIPv4Address
+            tcpClientSockets[nodeID].send('exit..............................................')
+            tcpClientSockets[nodeID].close()
+            clients.remove((current_client_id, nodeID))
+    except Exception as e:
+        pass
+        print "Exception caused in Closing the TCP connection with the node ",nodeIPv4Address
+        print "Error: ", e
+    try:
+        #print 'Node ' + nodeIPv4Address + ' leaving room ' + room
+        leave_room(room)
+    except Exception as e:
+        print "Exception caused in leaving room " + getRoom(nodeID)
+        print "Error: ", e
+
+    try:
+        #print "Setting crtsLaunched[" + str(nodeID) + "] set to False"
+        crtsLaunched[nodeID] = False
+    except Exception as e:
+        print "Exception caused in setting crtsLaunched to False"
+        print "Error: ",e
+
+    ########################################################################
+    # Close the socket connections that are related to the CRTS Controller
+    ########################################################################
+    if crtsControllerConnected[nodeID] == True:
+        print 'Closing connection to CRTS Controller'
+        #crtsInitialSocket.close()
+        shutdown[nodeID] = True
+        time.sleep(1)
+        packed = struct.pack('<ii', 9, 9)
+        try:
+            crtsControllerSockets[nodeID].send(packed);
+            crtsControllerSockets[nodeID].close()
+        except Exception as e:
+            print 'Error closing socket to node', nodeID
+            print 'Error:', e
+        crtsControllerConnected[nodeID] = False
+        print 'Shutdown complete'
+    scoreboardConnected = False
+
+# called when "scoreboard" button in cornet3d is pressed. Then waits for a connection
+# from a crts scenario that uses the SC_Scoreboard scenario controller
+# old code for reference, tutorials with scoreboard functionaity now use scoreboardThreadRunner below
+@socketio.on('launchScoreboard')
+def launchScoreboard(nodeID):
+    global scoreboardConnected
+    print 'launchScoreboard called for node', nodeID
+    room = getRoom(nodeID)
+    #1. Connect to scenario controller
+    scoreboardSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        scoreboardSocket.bind(('', 4444))
+        scoreboardSocket.listen(5)
+    except Exception as e:
+        print 'Exception thrown binding or listening on port 4444:', e
+    read_list = [scoreboardSocket]
+    lcv = 1
+    while lcv == 1:
+        readable, writable, errored = select.select(read_list, [], [], 1)
+        for s in readable:
+            if s is scoreboardSocket:
+                scoreboardConnection, addr = s.accept()
+                scoreboardConnected = True
+                print 'scoreboard connected from ', addr
+                lcv = 0
+
+    #Receive initial list of nodes and starting properties from crts
+    #and forward them to cornet3d
+    data = 0
+    list_of_nodes = []
+    while data == 0:
+        try:
+            data = scoreboardConnection.recv(10)
+            upacked = struct.unpack('=i', data)
+            num_nodes = upacked[0]
+            for i in range(num_nodes):
+                #receive initial node configuration
+                data = scoreboardConnection.recv(216)
+                #unpack data from struct
+                unpacked = struct.unpack('=ff200sii', data)
+                #find the first instance of \x00 (null terminated string from c)
+                pos = unpacked[2].find('\x00')
+                #pull necessary info from struct 
+                team_name = unpacked[2][:pos]
+                frequency = unpacked[0]
+                bandwidth = unpacked[1]
+                if unpacked[3] == 0:
+                    role = 'radio'
+                else:
+                    role = 'interferer'
+                node = unpacked[4]
+                #append a dictionary of data 
+                list_of_nodes.append({'team_name':team_name,'frequency':frequency, 'bandwidth':bandwidth, 'role':role, 'node':node})
+                #list_of_nodes.append((unpacked[2][:pos], unpacked[0], unpacked[1], unpacked[3]))
+        except Exception as e:
+            print 'e:', e
+    print list_of_nodes
+    join_room(room)
+    socketio.emit('initial_params', list_of_nodes, room=room)
+
+    #Once scenario is setup, receive frequency, bandwidth, and throughput updates from crts
+    while scoreboardConnected == True:
+        receivedData = scoreboardConnection.recv(16, socket.MSG_WAITALL)
+        if not receivedData: 
+            break;
+        else:
+            #print 'len(receivedData):', len(receivedData)
+            unpacked = struct.unpack('=iiff', receivedData)
+            #unpacked[0] will hold the type of feedback
+            #0 = packet error rate
+            if unpacked[0] == 0:
+                print 'per:', str(unpacked[2])
+                join_room(room)
+                socketio.emit('updatePerMetric', str(unpacked[2]), room=room)
+                socketio.emit('updateThroughputMetric', str(unpacked[3]), room=room)
+            #1 = new spectrum data
+            elif unpacked[0] == 1:
+                new_spectrum_data = {}
+                new_spectrum_data['node'] = unpacked[1]
+                new_spectrum_data['frequency'] = unpacked[2]
+                new_spectrum_data['bandwidth'] = unpacked[3]
+                join_room(room)
+                print 'Emitting spectrumUpdate'
+                socketio.emit('spectrumUpdate', new_spectrum_data, room=room)
+            elif unpacked[0] == 2:
+            #2 = new throughput data
+                new_throughput_data = {}
+                new_throughput_data['node'] = unpacked[1]
+                new_throughput_data['throughput'] = unpacked[2]
+                join_room(room)
+                print 'Emitting throughputUpdate'
+                socketio.emit('throughputUpdate', new_throughput_data, room=room)
+    return
+
+@socketio.on('connecting')
+def connecting(date):
+    print 'Client connecting date=', date
+
+@socketio.on('shutdown_scoreboard')
+def shutdown_scoreboard():
+    global scoreboardConnected
+    scoreboardConnected = False
+
+#This function is called for two reasons:
+# 1. When a user initially launches a tutorial from CORNET-3D, lines 480-492 run, starting crts and the threads necessary for 
+# network communication. 
+# 2. Once a tutorial is running, the function is also called whenever the user controls a radio with the on screen controls, and
+# lines 495-499 run 
+@socketio.on('launchTutorial')
+def launchTutorial(crtsParams):
+    global scoreboardConnected
+    myParams = crtsParams['params']
+    scenarioFile = crtsParams['params']['scenarioFileName']
+    IPs = []
+    for node in crtsParams['params']['nodes']:
+        IPs.append('192.168.1.' + str(node['lastIP']))
+
+    nodeID = crtsParams['nodeID']
+    room = getRoom(nodeID)
+    crtsCORNET3D = CORNET_3D_CRTS()
+    # Send the CRTS parameters to the transmitter using socket communication
+    try:
+        shutdown[nodeID] = False
+        #Start tutorial by creating communcations threads and using ssh to start CRTS_controller on cornet node
+        if crtsControllerConnected[nodeID] == False:
+            socket_listener_threads[nodeID] = threading.Thread(target=createSocketToController, args=(nodeID, 4445, ))
+            socket_listener_threads[nodeID].start()
+            crtsCORNET3D.launchCRTSTutorial(nodeID, scenarioFile, IPs)
+            print 'crts launched'
+            print 'here 3'
+            socket_listener_threads[nodeID].join()
+            #feedback_threads[nodeID] = threading.Thread(target=receiveDataFromCRTSController, args=(nodeID, ))
+            #feedback_threads[nodeID].start()
+            print 'Connection to crts established'
+            print 'Starting scoreboard thread'
+            scoreboardConnected = True
+            scoreboard_threads[nodeID] = threading.Thread(target=scoreboardThreadRunner, args=(nodeID, ))
+            scoreboard_threads[nodeID].start();
+
+        #Once the tutorial is running, relay new transmission control commands from the front end to the crts scenario controller
+        elif myParams['currentNodeId'] >= 0:
+            print 'Sending the following parameters to crts', crtsParams['params']
+            #Send all of the controllable parameters every time. The scenario controller will take care of only updating ones that have been updated
+            packed = struct.pack('<iiiiiiddd', 1, int(myParams['currentNodeId']) + 1, int(myParams['mod']), int(myParams['crc']), int(myParams['ifec']), int(myParams['ofec']), float(myParams['freq']), float(myParams['bandwidth']), float(myParams['gain']))
+            crtsControllerSockets[nodeID].sendall(packed)
+        else:
+            print 'currentNodeId:', myParams['currentNodeId']
+    except Exception as e:
+        print "Exception inside transmitter communication: ", nodeID
+        print LINE(), "Error: ",e
+        join_room(room)
+        emit('crtsLaunchResponse', 'Please choose another node as transmitter. There is a communication issue with the transmitter',room=room)
+
+#This function is in charge of relaying information necessary for the scoreboard functionality between the front end and the crts scenario controller  
+def scoreboardThreadRunner(nodeID):
+    #Receive initial list of nodes and starting properties from crts
+    #and forward them to cornet3d
+    room = getRoom(nodeID)
+    data = 0
+    list_of_nodes = []
+    while data == 0:
+        try:
+            #Receive the number of nodes involved in the experiment from the backend
+            data = crtsControllerSockets[nodeID].recv(4, socket.MSG_WAITALL)
+            print 'Initialized Scoreboard, received', len(data), 'bytes from crts'
+            upacked = struct.unpack('=i', data)
+            num_nodes = upacked[0]
+            print 'Initialized Scoreboard, received', num_nodes, 'nodes from crts'
+            #Receive initial scoreboard information from backend (team names, rolls, intial frequency and bandwidth)
+            for i in range(num_nodes):
+                #receive initial node configuration
+                data = crtsControllerSockets[nodeID].recv(216)
+                #unpack data from struct
+                unpacked = struct.unpack('=ff200sii', data)
+                #find the first instance of \x00 (null terminated string from c)
+                pos = unpacked[2].find('\x00')
+                #pull necessary info from struct 
+                team_name = unpacked[2][:pos]
+                frequency = unpacked[0]
+                bandwidth = unpacked[1]
+                if unpacked[3] == 0:
+                    role = 'radio'
+                else:
+                    role = 'interferer'
+                node = unpacked[4]
+                #append node data to list to send to front end
+                list_of_nodes.append({'team_name':team_name,'frequency':frequency, 'bandwidth':bandwidth, 'role':role, 'node':node})
+        except Exception as e:
+            print LINE(), 'Exception e:', e
+            closeTCPConnection(nodeID)
+            return
+    print 'list_of_nodes: ', list_of_nodes
+   # join_room(room)
+   #send list of nodes to front end so it can setup scoreboard display
+    socketio.emit('initial_params', list_of_nodes, room=room)
+
+    #Once scenario is setup, receive frequency, bandwidth, and throughput updates from crts
+    print 'Entering scoreboard loop'
+    gotThroughPut = False
+    while scoreboardConnected == True:
+        # this is pretty crappy code.
+        receivedData = crtsControllerSockets[nodeID].recv(28)
+        #print 'len(receivedData):', len(receivedData)
+        if not receivedData: 
+            break
+        elif len(receivedData) != 28:
+            print LINE(), 'read:', str(len(receivedData)), 'bytes  not 28'
+            continue
+        else:
+            #print LINE(), 'read:', str(len(receivedData))
+            unpacked = struct.unpack('=iifffff', receivedData)
+            #unpacked[0] will hold the type of feedback
+            #0 = packet error rate
+            if unpacked[0] == 0: # as defined in SC_CORNET_Display.cpp
+                print 'per:', str(unpacked[2])
+                #join_room(room)
+                socketio.emit('updatePerMetric', str(unpacked[2]), room=room)
+                socketio.emit('updateThroughputMetric', str(unpacked[3]), room=room)
+            #1 = new spectrum data
+            elif unpacked[0] == 1: # as defined in SC_CORNET_Display.cpp
+                print 'spectrum update'
+                new_spectrum_data = {}
+                new_spectrum_data['node'] = unpacked[1]
+                new_spectrum_data['frequency'] = unpacked[2]
+                new_spectrum_data['bandwidth'] = unpacked[3]
+                #join_room(room)
+                socketio.emit('spectrumUpdate', new_spectrum_data, room=room)
+            #2 = new throughput data
+            elif unpacked[0] == 2: # as defined in SC_CORNET_Display.cpp
+                new_throughput_data = {}
+                new_throughput_data['node'] = unpacked[1]
+                new_throughput_data['throughput'] = unpacked[2]
+                #join_room(room)
+                socketio.emit('throughputUpdate', new_throughput_data, room=room)
+                new_throughput_data['per'] = unpacked[3]
+                new_throughput_data['totalThroughput'] = unpacked[4]
+                new_throughput_data['totalPER'] = unpacked[5]
+                new_throughput_data['totalBits'] =  unpacked[6]
+                socketio.emit('crtsMetrics',  new_throughput_data, room=room)
+                if not gotThroughPut:
+                    print 'starting throughput update:', str(new_throughput_data)
+                    gotThroughPut = True
+            elif unpacked[0] == 3: # as defined in SC_CORNET_Display.cpp
+                new_throughput_data = {}
+                new_throughput_data['node'] = unpacked[1]
+                new_throughput_data['crts_type'] = unpacked[2]
+                socketio.emit('UnknownCRTSEvent', new_throughput_data);
+                print 'Got CRTS event:', new_throughput_data['crts_type']
+
+            else:
+                print 'Got feedback from SC_CORNET_Display of type', unpacked[0]
+                
+    return
+
+
+
+# Socket.io event for displaying connected users
+@socketio.on('users_req')
+def getClientsConnected():
+	print 'Connected Users list: ' + str(set(clients))
+	emit('users_rsp', str(set(clients)))
+
+
+# Class which validates parameters and IPv4 address
+class CORNET_3D_ValidateParameters:
+    def isIPv4AddressValid(self, ipAddress):
+        try:
+            socket.inet_pton(socket.AF_INET, ipAddress)
+        except AttributeError:
+            try:
+                    socket.inet_aton(ipAddress)
+            except Exception as e:
+                    return False
+            return ipAddress.count == 3
+        except Exception as e:
+            return False
+        return True
+
+    def isParamsValid(self, parameters):
+        try:
+            f = int(parameters['f'])
+            b = int(parameters['b'])
+            n = int(parameters['n'])
+            r = int(parameters['r'])
+            return True
+        except ValueError:
+            return False
+
+# Class which does the following:
+# 1. Computes IP addresses of the transmitter and receiver;
+# 2. Changes the scenario file;
+# 3. Launches the CRTS automatically using SSH
+class CORNET_3D_CRTS:
+    
+    def launchCRTSTutorial(self, nodeID, scenarioFile, IPs):
+        # Compute the IP address of the node where CRTS controller is to be launched
+        sshAddress = '192.168.1.' + str(nodeID)
+
+        try:
+            # SSH to this node
+            s = pxssh.pxssh()
+            if s.login(sshAddress, os.environ['USER'], ''):
+                # Run the commands required to launch the CRTS
+                command = 'cd ~/git/old_cornet3d/crts; python scenarios/utility_scenarios/cornet_3d_change_scenario.py ' + scenarioFile + ' '
+                print "Launching CRTS controller at node", sshAddress
+                for ip in IPs:
+                    command = command + ip + ' '
+                command = command + '&'
+                print LINE(), 'command:', command
+                s.sendline(command)
+                s.prompt()
+                s.logout()
+                time.sleep(3)
+            else:
+                print "Unable to login to the controller node", sshAddress, "for launching CRTS."
+        except Exception as e:
+            print "Exception caused while launching controller via SSH."
+            print LINE(), "Error:", e
+
+
+if __name__ == '__main__':
+    parser = OptionParser()
+    parser.add_option('-p', '--port', type='int', default=8889)
+    (options, args) = parser.parse_args()
+
+    print "\nTry: firefox http://kermit.wireless.vt.edu:" + str(options.port) + "/\n\n"
+    socketio.run(app, host='0.0.0.0', port=options.port)
+    print "Do we ever reach this point in the code"
