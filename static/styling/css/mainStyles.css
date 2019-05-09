@@ -12,11 +12,11 @@ and open the template in the editor.
         body{width:100%;height:100%;margin:0;padding:0px;overflow:hidden;}
             
         .overlayButton {
-		position: fixed;
+        position: fixed;
                 display: block; 
-		bottom: 0px;
+        bottom: 0px;
                 width: 100%;                            
-		z-index: 10;
+        z-index: 10;
                 height: 45px;
                 padding: 5px; 
                 background-color: #666; 
@@ -78,130 +78,130 @@ and open the template in the editor.
                 border: none; 
                 }                
                         
-	#scoreArea {
-		position: fixed;
-		top: 0px;
-		left: 0px;
-		z-index: 10;
-		padding: 3px;
-		}
+    #scoreArea {
+        position: fixed;
+        top: 0px;
+        left: 0px;
+        z-index: 10;
+        padding: 3px;
+        }
                         
-	#statusBox {
-		position: fixed;
-		top: 0px;
-		left: 0px;
-		z-index: 99999;
-		padding: 3px;
-		color:green;
-		font-size: 20px;
-		font-weight: 900;
-		display:none;
+    #statusBox {
+        position: fixed;
+        top: 0px;
+        left: 0px;
+        z-index: 99999;
+        padding: 3px;
+        color:green;
+        font-size: 20px;
+        font-weight: 900;
+        display:none;
                 }
-	.semiTransparentWind {
-		opacity: 0.9;
-		}
+    .semiTransparentWind {
+        opacity: 0.9;
+        }
                 
-	.window_div{
-		padding-right:4px;
-		padding-left:16px;
-		border-width:2px;
-		}
+    .window_div{
+        padding-right:4px;
+        padding-left:16px;
+        border-width:2px;
+        }
                         
         #help_button{
-		font-family: "Charcoal", Sans-Serif;
-		font-size: 20px;
-		color: white;
-		font-weight: bold;
+        font-family: "Charcoal", Sans-Serif;
+        font-size: 20px;
+        color: white;
+        font-weight: bold;
                 margin-left: 10px; 
                 margin-right: 10px; 
-		}
+        }
                 
                     
-	.right_button{
-		width: 38px;
-		height: 38px;
-		padding: 0;
+    .right_button{
+        width: 38px;
+        height: 38px;
+        padding: 0;
                 margin: 0; 
                 margin-top: 3px; 
                 margin-left: 2px; 
                 border: 1px solid black; 
                 vertical-align: middle; 
-		overflow:hidden;
+        overflow:hidden;
                 cursor: pointer; 
-		}
+        }
                 
-	.left_button{
-		width: 38px;
-		height: 38px;
-		padding: 0;
+    .left_button{
+        width: 38px;
+        height: 38px;
+        padding: 0;
                 margin: 0; 
                 margin-top: 3px; 
                 margin-right: 2px; 
                 border: 1px solid black; 
                 vertical-align: middle; 
-		overflow:hidden;
+        overflow:hidden;
                 cursor: pointer; 
-		}                
+        }                
                 
         .tutorialUpdate_button {
                 background-image: url('../../myicons/update.png'); 
                 background-repeat: no-repeat; 
-		height: 38px;
+        height: 38px;
                 width: 152px; 
-		padding: 0;
+        padding: 0;
                 padding-left: 42px; 
                 padding-right: 5px; 
                 margin: 0; 
                 border: 1px solid black; 
                 vertical-align: middle; 
-		overflow:hidden;
+        overflow:hidden;
                 cursor: pointer; 
                 }
 
         .tutorial_button{
                 background-image: url('../../myicons/tutorial-icon.png'); 
                 background-repeat: no-repeat; 
-		height: 38px;
+        height: 38px;
                 width: 152px; 
-		padding: 0;
+        padding: 0;
                 padding-left: 42px; 
                 padding-right: 5px; 
                 margin: 0; 
                 border: 1px solid black; 
                 vertical-align: middle; 
-		overflow:hidden;
+        overflow:hidden;
                 cursor: pointer; 
-		}  
+        }  
                 
         .scoreboard_button{
                 background-image: url('../../myicons/scoreboard-icon.png'); 
                 background-repeat: no-repeat; 
-		height: 38px;
+        height: 38px;
                 width: 152px; 
-		padding: 0;
+        padding: 0;
                 padding-left: 42px; 
                 padding-right: 5px; 
                 margin: 0; 
                 border: 1px solid black; 
                 vertical-align: middle; 
-		overflow:hidden;
+        overflow:hidden;
                 cursor: pointer; 
-		}                  
+        }                  
                 
         .exit_button{
                 background-image: url('../../myicons/exit.png'); 
                 background-repeat: no-repeat; 
-		height: 38px;
+        height: 38px;
                 width: 152px; 
-		padding: 0;
+        padding: 0;
                 padding-left: 42px; 
                 padding-right: 5px; 
                 margin: 0; 
                 border: 1px solid black; 
                 vertical-align: middle; 
-		overflow:hidden;
+        overflow:hidden;
                 cursor: pointer; 
-		}                 
+        }                 
    
         .scoreboard_button img, 
         .exit_button img, 
@@ -225,41 +225,41 @@ and open the template in the editor.
                 }                
                         
                        
-	#slidersContainer{
-		left:18px;
-		position: fixed;
-		bottom: 60px;
-		z-index: 20;
-		margin-left: -16px;
+    #slidersContainer{
+        left:18px;
+        position: fixed;
+        bottom: 60px;
+        z-index: 20;
+        margin-left: -16px;
                 height: 450px;
-		}
+        }
                 
-	svg, canvas {
-		position: absolute;
-		}
+    svg, canvas {
+        position: absolute;
+        }
                 
-	.axis text {
+    .axis text {
                 font-size: 14px;
-		font-weight: bold;
+        font-weight: bold;
                 }
                 
-	.axis path,
-	.axis line {
-	        fill: none;
-		stroke: #fff;
-		shape-rendering: crispEdges;
-		stroke-width: 2;
+    .axis path,
+    .axis line {
+            fill: none;
+        stroke: #fff;
+        shape-rendering: crispEdges;
+        stroke-width: 2;
                 }
         
-	.axis path {
-	        display: none;
-		}
+    .axis path {
+            display: none;
+        }
                 
-	.legendText {
-		font-size:20px;
-		font-family:"Arial, sans-serif";
-		font-weight: bold;
-		}
+    .legendText {
+        font-size:20px;
+        font-family:"Arial, sans-serif";
+        font-weight: bold;
+        }
                 
                 
                
@@ -291,11 +291,11 @@ and open the template in the editor.
         padding: 10px; 
         height: 130px;
         }
-	.sliderLabel{
-		text-align:center;
-		color:red;
-		font-weight:bold;
-		}
+    .sliderLabel{
+        text-align:center;
+        color:red;
+        font-weight:bold;
+        }
                 
     .settingsDiv {
         float: left; 
@@ -321,10 +321,10 @@ and open the template in the editor.
         }        
      
                
-	select {
-		font-family:serif;
-		opacity: 0.8;
-		}
+    select {
+        font-family:serif;
+        opacity: 0.8;
+        }
       
         .continueButton, 
         .tutorialSelectButton {

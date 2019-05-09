@@ -13,12 +13,12 @@ import sys
 
 # 'Flask' libraries for web socket programming with the client/web-browser
 from flask import Flask, render_template, request, send_from_directory
-from flask.ext.socketio import SocketIO, emit
+from flask_socketio import SocketIO, emit
 from flask_socketio import join_room, leave_room
 import flask
 
 # Library for SSH
-import pxssh
+from pexpect import pxssh
 
 # Library for TCP socket connection
 from socket import *
@@ -26,7 +26,7 @@ import socket
 import select
 
 # Library for Cross origin and for having server available to all the browsers
-from flask.ext.cors import CORS, cross_origin
+from flask_cors import CORS, cross_origin
 
 # Library for sleep
 import time
@@ -298,16 +298,16 @@ def startSpectrum(initParams):
 #Restarts the spectrum sensing script on a node in case it goes down for some reason
 def restart_spectrum_sensing(nodeIP):
     print 'restarting spectrum_sensing on node:' + str(nodeIP)
-    # TODO: Remove the use of this hard coded path piece: /git/old_cornet3d/
+    # TODO: Remove the use of this hard coded path piece: /git/dead_horse/
     run = 'nohup /users/' +\
-        os.environ['USER'] + '/git/old_cornet3d/spectrumSensing' +\
-        ' -f 751000000 -b 12000000 -n 256 -r 2 -p ' +\
+        os.environ['USER'] + '/git/dead_horse/spectrumSensing' +\
+        ' -f 865000000 -b 12000000 -n 256 -r 2 -p ' +\
         str(tcpSpectrumPort) +\
         ' >/dev/null 2>&1 &'
     print run
     p = pxssh.pxssh()
     try:
-        p.login(nodeIP, os.environ['USER'], '')
+        p.login(nodeIP, os.environ['USER'], '', sync_multiplier=2)
         p.sendline(run)
         p.prompt()
         p.logout()
@@ -445,7 +445,7 @@ def launchScoreboard(nodeID):
                 #list_of_nodes.append((unpacked[2][:pos], unpacked[0], unpacked[1], unpacked[3]))
         except Exception as e:
             print 'e:', e
-    print list_of_nodes
+    print list_of_nodes,  'line 448'
     join_room(room)
     socketio.emit('initial_params', list_of_nodes, room=room)
 
@@ -580,7 +580,7 @@ def scoreboardThreadRunner(nodeID):
             print LINE(), 'Exception e:', e
             closeTCPConnection(nodeID)
             return
-    print 'list_of_nodes: ', list_of_nodes
+    print 'list_of_nodes: line 583', list_of_nodes
    # join_room(room)
    #send list of nodes to front end so it can setup scoreboard display
     socketio.emit('initial_params', list_of_nodes, room=room)
@@ -690,9 +690,14 @@ class CORNET_3D_CRTS:
         try:
             # SSH to this node
             s = pxssh.pxssh()
-            if s.login(sshAddress, os.environ['USER'], ''):
+            if s.login(sshAddress, os.environ['USER'], '', sync_multiplier=2):
+		# send a command and match the prompt
+		s.sendline('ls')
+		print "dummy message"
+		s.prompt()
+		print(s.before)
                 # Run the commands required to launch the CRTS
-                command = 'cd ~/git/old_cornet3d/crts; python scenarios/utility_scenarios/cornet_3d_change_scenario.py ' + scenarioFile + ' '
+                command = 'cd ~/git/dead_horse/crts; python scenarios/utility_scenarios/cornet_3d_change_scenario.py ' + scenarioFile + ' '
                 print "Launching CRTS controller at node", sshAddress
                 for ip in IPs:
                     command = command + ip + ' '
@@ -711,7 +716,7 @@ class CORNET_3D_CRTS:
 
 if __name__ == '__main__':
     parser = OptionParser()
-    parser.add_option('-p', '--port', type='int', default=8889)
+    parser.add_option('-p', '--port', type='int', default=8892)
     (options, args) = parser.parse_args()
 
     print "\nTry: firefox http://kermit.wireless.vt.edu:" + str(options.port) + "/\n\n"

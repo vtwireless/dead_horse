@@ -21,8 +21,8 @@ SC_CORNET_Display::SC_CORNET_Display(int argc, char** argv) {
   struct sockaddr_in addr;
   memset(&addr, 0, sizeof(addr));
   addr.sin_family = AF_INET;
-  // "192.168.1.103" is the IP address of kermit behind the firewall
-  addr.sin_addr.s_addr = inet_addr("192.168.1.103");
+  // "192.168.147" is the IP address of kermit behind the firewall
+  addr.sin_addr.s_addr = inet_addr("192.168.1.147");
   addr.sin_port = htons(4445/*port number*/);
 
   // Establish network connection with CORNET-3D backend
@@ -90,8 +90,8 @@ void SC_CORNET_Display::initialize_node_fb() {
         set_node_parameter(i, CRTS_FB_EN, (void*) &fb_enables);
 
     //Set up statistics logging
-    double rx_stats_period = 3.0; //3 second window to average statistics over
-    double rx_stats_report_rate = 1.0; //Report statistics once per second
+    double rx_stats_period = 3; //3 second window to average statistics over
+    double rx_stats_report_rate = 1; //Report statistics once per second
     for(int i=1; i<=sp.num_nodes; i++)
     {
         set_node_parameter(i, CRTS_RX_STATS, (void*) &rx_stats_period);

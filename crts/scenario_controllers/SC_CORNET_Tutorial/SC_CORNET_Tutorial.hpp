@@ -5,7 +5,7 @@
 #include "CORNET_3D.hpp"
 
 #define CORNET_Tutorial_PORT 4444
-#define CORNET_Tutorial_IP "192.168.1.103"
+#define CORNET_Tutorial_IP "192.168.1.147"
 
 class SC_CORNET_Tutorial : public ScenarioController {
 

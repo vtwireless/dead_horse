@@ -39,8 +39,8 @@ var spectrum = (function () {
 	thisModule.m_power=50;
 	var scoreDiv='scoreDiv';
 	var scoreTotal=0;
-	var scaleFactor=0.5;
-	var scaleOffset=4;
+	var scaleFactor=0.09;
+	var scaleOffset=3;
 	var socket;
 	//var crtsSocket;
 	//in MHZ
@@ -49,14 +49,15 @@ var spectrum = (function () {
 	thisModule.lowBound_=centerF_-thisModule.bandwidth_/2;
 	thisModule.selectedCenter=0;
 	thisModule.selectedBandWidth=0;
+	var lowBound_ = centerF_-thisModule.bandwidth_/2;
 	var highBound_=centerF_+thisModule.bandwidth_/2;
 	
 	var period;
 	var r;
         var trans_x = [];
         trans_x.push({translation:0 , bandwidth:0});
-//        var diffue_color = ['green','blue','red','teal','lightsalmon','orange'];// for coloring the boxes
-        var diffue_color = ['','','','','',''];// for coloring the boxes
+        var diffue_color = ['green','blue','red','teal','lightsalmon','orange'];// for coloring the boxes
+//        var diffue_color = ['','','','','',''];// for coloring the boxes
         var spectrum_data;
 		/* accepts parameters
 	 * h  Object = {h:x, s:y, v:z}
@@ -66,11 +67,11 @@ var spectrum = (function () {
 
 	function processResponse(data) {
             //alert(data[2]);
-		var data = data.map(function(x) { return Math.log(x)*scaleFactor + scaleOffset; });// why we are mapping the data here?
+		var data = data.map(function(x) { return 10*Math.log10(x)*scaleFactor + scaleOffset; });// why we are mapping the data here?
                 spectrum_data = data;
 	//to avoid displaying negative data values as height and color	
             for (var i=0; i<data.length; i++) {
-                    if (data[i] < 0){data[i]= 0;}
+                   // if (data[i] < 0){data[i]= 0;}
                 }
 		
 		//Random Data
@@ -79,7 +80,7 @@ var spectrum = (function () {
 			for(var i=0; i<50; i++) {
 				data.push(3*Math.random());
 			}
-			console.log(data);
+			 console.log(data); // 20190212
 		} else {
 			if(data.length<2){
 				m_showfloors();
@@ -377,7 +378,7 @@ var spectrum = (function () {
 		  // else width = height / ka;
 
 		  var x = d3.scale.linear()
-		      .domain([/*thisModule.lowBound_*/0, highBound_])
+		      .domain([0*lowBound_, highBound_])
 		      .range([0, width]);
 
 		  var y = d3.scale.linear()
@@ -577,7 +578,7 @@ return d.opacity;
 		m_count=0;
 		m_showfloors=show_floors;
 		m_showStatus=showStatus;
-        m_teamNames = {}; // key is node that is passed in in 'crtsMetrics'
+              m_teamNames = {}; // key is node that is passed in in 'crtsMetrics'
 		m_overlay=selOverlay(document.getElementById('layer2'), leftGraphMargin, rightGraphMargin);
 		
 		//fitToContainer(document.getElementById('layer2'));
@@ -590,13 +591,19 @@ return d.opacity;
 		socket.on('time', function(data) {
                     
 			if(thisModule.connected && new Date().getTime() - prevTime >= period) {
-				processResponse(JSON.parse(data));
+try {		
+
+		processResponse(JSON.parse(data));
 				prevTime = new Date().getTime();
+
+}
+catch(e){//nothing
+}
 			}
         	});
 		
         	socket.on('users_rsp', function(data) {
-			console.log(data.toString());
+			console.log(data.toString());  // 20190212
             		alert(data.toString());
         	});
 		socket.on('error', function(error) { console.error(error) });
@@ -606,7 +613,7 @@ return d.opacity;
     		socket.emit ('nodeID', initParams);
     		thisModule.connected=true;
     		convertToMHz(transParams);
-    		console.log(JSON.stringify(transParams));
+    		console.log(JSON.stringify(transParams));  // 20190212
                 
                 // ==============================================================
 		socket.on('updatePerMetric', function(data) {
@@ -668,10 +675,11 @@ return d.opacity;
                         // assigning each team a separate row 
                         teams_names.push(data[0].team_name); 
                         trans_y[0] = -0.5;//alert(teams_names[0]);
-                        for (var i =1; i<data.length; ++i)
+                        for (var i =1; i<data.length; ++i)   // based on Ayat's code
                             {
                             var exist = 1;
                             for (var n =0; n < teams_names.length; ++n){
+//                            for (var n =1; n < teams_names.length; ++n){ //20190209
                                 if (teams_names[n] != data[i].team_name)
                                     {exist = 0;}
                                 else
@@ -687,7 +695,8 @@ return d.opacity;
                         // TODO: This code totally sucks:  We need the
                         // team names elsewhere.
                         for(var i=0; i<teams_names.length; ++i)
-                            m_teamNames[(i+1).toString()] = teams_names[i];
+                           m_teamNames[(i).toString()] = teams_names[i]; // 20190209
+                           // m_teamNames[(i+1).toString()] = teams_names[i];
 
                         //
                         trans_x = [];
@@ -767,7 +776,7 @@ return d.opacity;
                       
                    
 		socket.on('spectrumUpdate', function(data) {
-			console.log(JSON.stringify(data));
+			 console.log(JSON.stringify(data)); // 20190212
                         //data_json = '"['+JSON.stringify(data)+']"';
                         obj = JSON.parse(data_json);
                         obj.push(data);
@@ -776,9 +785,9 @@ return d.opacity;
                        //data_json.push(JSON.stringify(data));
                         
                         //alert(data_json);
-                        data.node = data.node -1;
-console.log("data:  ");
-console.log(JSON.stringify(data));
+//                        data.node = data.node -1; // 20190209
+ console.log("data:  ");  // 20190209
+ console.log(JSON.stringify(data));  // 20190209
                                                 
                         //for (var i =0; i<data.length; ++i){
                             unit = 20/thisModule.bandwidth_;
@@ -1248,15 +1257,16 @@ console.log(JSON.stringify(data));
 		// Get the response from the server
 		socket.on('crtsMetrics', function(data) {
 
-            /*
+            
 			console.log('CRTS METRICS: node ' + data.node + '\n' +
                 '     throughput: ' + data.throughput + '\n' +
                 '            per: ' + data.per + '\n' +
                 'totalThroughput: ' + data.totalThroughput + '\n' +
                 '       totalPER: ' + data.totalPER + '\n');
-            */
+            
 
-            var node = data.node.toString();
+ //           var node = data.node.toString() - 1;  //20190209
+           var node = data.node.toString();
 
             if(data.node === undefined ||
                 data.totalThroughput === undefined ||
@@ -1294,7 +1304,8 @@ console.log(JSON.stringify(data));
                 //divOuter.appendChild(createNumberDisplay('throughput', 'Short Term - Throughput (bps)'));
                 //divOuter.appendChild(createNumberDisplay('per', 'Short Term - Packet Error Rate'));
                 divOuter.appendChild(createNumberDisplay('totalThroughput', 'Scenanio Average - Throughput (bps)'));
-                divOuter.appendChild(createNumberDisplay('totalPER', 'Scenanio Average - Packet Error Rate'));
+                divOuter.appendChild(createNumberDisplay('per', 'Scenanio Average - Packet Error Rate'));
+//                divOuter.appendChild(createNumberDisplay('totalPER', 'Scenanio Average - Packet Error Rate'));  //20190209
                 divOuter.appendChild(createNumberDisplay('totalBits', 'Scenanio Total (bits)'));
                 document.getElementById("performanceMetricDiv").appendChild(divOuter);
             }
@@ -1309,9 +1320,9 @@ console.log(JSON.stringify(data));
             }
 
             //setValue('throughput', 1);
-            //setValue('per', 3);
+            setValue('per', 3);
             setValue('totalThroughput', 1);
-            setValue('totalPER', 3);
+//            setValue('totalPER', 3);
             setValue('totalBits', 0);
 		});
 	}

@@ -20,7 +20,7 @@ SC_CORNET::SC_CORNET(int argc, char** argv) {
   struct sockaddr_in addr;
   memset(&addr, 0, sizeof(addr));
   addr.sin_family = AF_INET;
-  addr.sin_addr.s_addr = inet_addr("192.168.1.103"/*IP*/);
+  addr.sin_addr.s_addr = inet_addr("192.168.1.147"/*IP*/);
   addr.sin_port = htons(4444/*PORT*/);
 
   // Attempt to connect client socket to server

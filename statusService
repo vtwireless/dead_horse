@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 var Connection = require('ssh2');
-var totalNodes=36;
+var totalNodes=48;
 var ipNumbersStartFrom=11;
 var IPsEnd=ipNumbersStartFrom+totalNodes;
 var results={};
@@ -109,16 +109,75 @@ var server = http.createServer(function (request, response) {
 	    console.log(response);
 	});
 
+	// initialize the results
 	for (var i=ipNumbersStartFrom; i<IPsEnd; i++)
 		results['192.168.1.'+i]=0;
 
-	for (var i=ipNumbersStartFrom; i<IPsEnd; i++)
-        sshTo('192.168.1.'+i,'user','pass',  'uhd_find_devices', b);
+	results['192.168.1.11']=0;
+	results['192.168.1.12']=0;
+	results['192.168.1.13']=0;
+	results['192.168.1.14']=0;
+	results['192.168.1.15']=0;
+	results['192.168.1.16']=0;
+	results['192.168.1.17']=0;
+	results['192.168.1.18']=0;
+	results['192.168.1.19']=0;
+	results['192.168.1.20']=0;
+	results['192.168.1.21']=0;
+	results['192.168.1.22']=0;
+	results['192.168.1.23']=0;
+	results['192.168.1.24']=0;
+	results['192.168.1.25']=0;
+	results['192.168.1.26']=0;
+	results['192.168.1.27']=0;
+	results['192.168.1.28']=0;
+	results['192.168.1.29']=0;
+	results['192.168.1.30']=0;
+	results['192.168.1.31']=0;
+	results['192.168.1.32']=0;
+	results['192.168.1.33']=0;
+	results['192.168.1.34']=0;
+	results['192.168.1.35']=0;
+	results['192.168.1.36']=0;
+//	results['192.168.1.44']=1;
+//	results['192.168.1.45']=1;
+//	results['192.168.1.46']=1;
+//	results['192.168.1.47']=1;
+//	results['192.168.1.48']=1;
+//	results['192.168.1.49']=1;
+//	results['192.168.1.50']=1;
+//	results['192.168.1.51']=1;
+//	results['192.168.1.52']=1;
+//	results['192.168.1.53']=1;
+//	results['192.168.1.54']=1;
+//	results['192.168.1.55']=1;
+//	results['192.168.1.56']=1;
+//	results['192.168.1.57']=1;
+//	results['192.168.1.58']=1;
+
+
+
+
+
+	   //for (var i=ipNumbersStartFrom; i<IPsEnd; i++)
+        sshTo('192.168.1.37','user','pass',  'uhd_find_devices', b);
+        sshTo('192.168.1.38','user','pass',  'uhd_find_devices', b);
+        sshTo('192.168.1.39','user','pass',  'uhd_find_devices', b);
+        sshTo('192.168.1.40','user','pass',  'uhd_find_devices', b);
+        sshTo('192.168.1.41','user','pass',  'uhd_find_devices', b);
+        sshTo('192.168.1.42','user','pass',  'uhd_find_devices', b);
+        sshTo('192.168.1.43','user','pass',  'uhd_find_devices', b);
+	
+
+
+
+
+
 });
 
 
-server.listen(8890);
+server.listen(8893);
 
 // TODO: get IP address or domain name at runtime.
-console.log("\nTry:  http://128.173.221.40:8890/crts_status_xxx\n\n");
+console.log("\nTry:  http://128.173.221.40:8893/crts_status_xxx\n\n");
 

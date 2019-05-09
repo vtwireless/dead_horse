@@ -38,7 +38,7 @@
 				//var m_fullscreen=false;
 
                 // TODO: fix stupid hard coded IP address and port
-                var url = 'http://128.173.221.40:8890/crts_status_xxx';
+                var url = 'http://128.173.221.40:8893/crts_status_xxx';
                 console.log('Requesting: ' + url);
 				function ajaxReq() {
 					var req = $.ajax({
@@ -282,7 +282,7 @@
 							duration: 500
 						},
 						hide: {
-							effect: "explode",
+							effect: "none",
 							duration: 1000
 						},
 						position: { my: "right top", at: "right top", of: window },
@@ -352,7 +352,7 @@
 							duration: 500
 						},
 						hide: {
-							effect: "explode",
+							effect: "none",
 							duration: 1000
 						},
 						position: { my: "right bottom", at: "right bottom-49", of: window },
@@ -516,7 +516,7 @@
 							duration: 500
 						},
 						hide: {
-							effect: "explode",
+							effect: "none",
 							duration: 1000
 						},
 						position: { my: "center bottom", at: "center bottom-61", of: window },
@@ -632,7 +632,7 @@
 							duration: 500
 						},
 						hide: {
-							effect: "explode",
+							effect: "none",
 							duration: 1000
 						},
 						position: { my: "left top", at: "left top", of: window },
@@ -648,7 +648,7 @@
 							duration: 500
 						},
 						hide: {
-							effect: "explode",
+							effect: "none",
 							duration: 1000
 						},
 						position: { my: "right top", at: "right top", of: window },

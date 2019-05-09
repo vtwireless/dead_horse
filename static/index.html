@@ -55,10 +55,10 @@
           .tick line{
             opacity: 0.2;
           }
-          #container, #containera, #containerb,#Teams_container{width:100%;}
+         #Teams_container{width:100%;}
           
-          #left,#leftb,#leftt,#leftb_team{float:left;width:300px;height:300px;padding-left:10px;}
-          #right,#rightb,#rightt,#rightb_team{float:right;width:300px;height:300px;padding-right:10px;}
+          #left{float:left;width:300px;height:300px;padding-left:10px;}
+          #right{float:right;width:300px;height:300px;padding-right:10px;}
           
           .svg-container {
             display: inline-block;
@@ -986,57 +986,69 @@
                         </div>
                     </div>
                     <div class="controlTableRow"> 
-                        <div class="controlTableCol1">BINS:</div>
+                        <div class="controlTableCol1" style="display:none">BINS:</div>
                         <div class="controlTableCol2">
-			  <input id='n' size='8' value='256' style='text-align:center'>
+			  <input id='n' size='1' value='256' style="display:none; text-align:center">
                         </div>
                     </div>
                     <div class="controlTableRow"> 
-                        <div class="controlTableCol1">UPDATES/SEC:</div>
+                        <div class="controlTableCol1" style="display:none">UPDATES/SEC:</div>
                         <div class="controlTableCol2">
-			  <input id='r' size='8' value='12' style='text-align:center'>
+			  <input id='r' size='1' value='12' style="display:none; text-align:center">
                         </div>
                     </div>
                     <div class="controlTableRow"> 
-                        <div class="controlTableCol1">SWEEPS:</div>
+                        <div class="controlTableCol1" style="display:none">SWEEPS:</div>
                         <div class="controlTableCol2">
-			  <input id='s' size='8' value='1' style='text-align:center'>
+			  <input id='s' size='1' value='1' style="display:none; text-align:center">
                         </div>
                     </div>                    
                 </div>
-			
-				
+
+
+
 				<div id='scaleSlider'>
                                     
 					 <div id="scaleSlider" 
                                               class='sliderDiv' 
-                                              style="margin-top: 10px;"width: 100%;" 
+                                              style="display:none;" 
+                                          
                                               title='Y-scale for making graph flatter/stretched' >
-						<div class='sliderLabel' style="display: inline-block">Scale</div>
-						<div id="y-scale" class='sliderLabel' style="display: inline-block">1</div> 
-						<div class='sliderLabel' style="display: inline-block">times</div>
+						
+						<div id="y-scale" class='sliderLabel' style="display:none">1.2</div> 
+						
 						<br>
-						<div id="slider-y-scale" style="display: block; margin-top: 10px; margin-left: auto; margin-right: auto;">></div>
+						<div id="slider-y-scale" style="display:none; margin-top: 10px; margin-left: auto; margin-right: auto;"></div>
 					</div>
 					
 					<div id="historySlider"
                                              class='sliderDiv' 
-                                             style="margin-top: 20px; width: 100%;"
+                                             style="display:none;" 
+                                            
                                              title='Change history of the graph' >
-						<div class='sliderLabel' style="display: inline-block">History</div>
-						<div id="time-slices" class='sliderLabel' style="display: inline-block">10</div>
-						<div class='sliderLabel' style="display: inline-block">time-slices</div>
+						
+						<div id="time-slices" class='sliderLabel' style="display:none">24</div>
+						
 						<br>
-						<div id="slider-time-slices" style="display: block; margin-top: 10px; margin-left: auto; margin-right: auto;">></div>
+						<div id="slider-time-slices" style="display:none; margin-top: 10px; margin-left: auto; margin-right: auto;"></div>
 						<br>
 					</div>
 				</div>
             
 			</div>
+
+
+
+
+
+
+
+
+
              <input id="updateSpectrumViewerControls" 
                     type="button" 
                     class="tutorialUpdate_button" 
-                    style="position: absolute; bottom: 5px; left: 70px; display:inline-block;" 
+                    style="position: absolute; bottom: 5px; left: 70px; display:none;" 
                     title="click here to update spectrum viewer parameters" 
                     value="Update" />
           
@@ -1076,7 +1088,7 @@
 						  <option value="28">32QAM</option>
 						  <option value="29">64QAM</option>
 						 
-                                                 <!-- <option value="17">2ASK</option> -->
+                         <!-- <option value="17">2ASK</option> -->
 						 <!--  <option value="18">4ASK</option> -->
 						 <!--  <option value="19">8ASK</option> -->
 						 <!--  <option value="20">16ASK</option> -->
@@ -1220,16 +1232,16 @@
 //  BEGIN.  Tool Bar / Menu 
 // ============================================================================-->
 		<div class="overlayButton">
-                    <div class="helpButtonContainer">
-                        <button id="help_button" class="right_button" title='Help'>?</button>
+        <div class="helpButtonContainer">
+            <!-- <button id="help_button" class="right_button" title='Help'>?</button> -->
                     </div>                    
                     <div id="speedButtonContainer" class="speedButtonContainer" style="display:none;">
-			<button id='transmit_button' class='right_button' disabled='disabled' title="Transmit" style='display:none'>
+			<!--  <button id='transmit_button' class='right_button' disabled='disabled' title="Transmit" style='display:none'> 
 				<img alt="" src='transmitOff.gif' width='32' height='32' style='margin:-7px'>
-			</button>
-			<button id='rand_button' class='right_button' style='display:none' title="Toggle real/random spectal data">
+			</button> -->
+			<!-- <button id='rand_button' class='right_button' style='display:none' title="Toggle real/random spectal data">
 				<img alt="" src='RandOff.gif' width='38' height='38' >
-			</button>
+			</button> -->
 			<button id='settings_button' class='right_button' title="Set center frequency, bandwidth, and the number of FFT bins">
 				<img alt="" src='myicons/settings.png' width='38' height='38' >
 			</button>
@@ -1239,18 +1251,18 @@
 			<button id='graph_button' class='right_button' title="Visualize spectrum using a line graph">
 				<img alt="" src='graph4.gif' width='38' height='38' >
 			</button>
-			<button id='users_button' class='right_button' title="Display the Users">
+			 <button id='users_button' class='right_button' style="display:none;" title="Display the Users">
 				<img alt="" src='myicons/users.gif' width='38' height='38' style='margin:-10px'>
-			</button>
+			</button> 
 			<button id='metrics_button' class='right_button' title="Performance metrics">
 				<img alt="" src='myicons/metrics.png' width='38' height='38' style='margin:-10px;'>
 			</button>
                     </div>
-                    <div id="speedButtonContainer2" class="speedButtonContainer2" style="display:none;">
+                   <div id="speedButtonContainer2" class="speedButtonContainer2" style="display:none;">
                         <button id='game_button' class='right_button' title="Show/hide game controls">
 				<img alt="" src='myicons/GameControllerOff.png' style="width:38px; height:38px;">
 			</button>
-                    </div>
+                    </div> 
                    <div id="tutorialButtonContainer" class="tutorialButtonContainer" style="display:none">
                        			
 			<div style="background-color: white; display:inline; font-size:16px; padding: 10px; display:none; ">
@@ -1258,7 +1270,7 @@
 				<label for="slow_conn_checkbox" style="vertical-align:middle;">Remove 3D drawing</label>
 			</div>
 			&nbsp;
-                        <!--  =============================================================================================        --> 
+            <!--  =============================================================================================        --> 
 			<!-- <div style="background-color: white; display:inline; font-size:16px; padding: 10px; display: none;">  -->
 			<!-- 	<label for="tx_node_crts" style="vertical-align:middle;">Transmitter node for CRTS</label>         -->
 			<!-- 	<select id='tx_node_crts_options' title="Select a transmitter node for CRTS"></select>             -->
@@ -1280,15 +1292,15 @@
                                title="click here to launch a tutorial" 
 				style="display:none"
                                value="Tutorials" />
-                        <input id="launch_scoreboard" type="button" 
+			<!--               <input id="launch_scoreboard" type="button" 
                                onclick="spectrum.launchScoreboard();"                               
                                class="scoreboard_button" 
                                title="click here to launch the scoreboard"
-                               value="Scoreboard" />                        
+                               value="Scoreboard" />    -->                    
                         <input id="exitTutorialBtn" type="button" 
                                onclick="corStatus.showFloors();"
                                class="exit_button" 
-                               title="click here to exit a tutorial" value="Exit" />
+                               title="click here to exit a tutorial" value="Exit" />  
                         <div style="background-color: #A9A9A9; display:inline; font-size:12px; padding: 10px;">
                         <label for="throughput_checkbox" style="vertical-align:middle;">Throughput graphs</label>
                         <input type="checkbox" id="launch_Throughput_graphs" name="Throughput_graphs" value="Throughput_graphs" style="width:20px; height:20px; vertical-align:middle;">
@@ -1311,22 +1323,32 @@
 //  END.  Tool Bar / Menu 
 // ============================================================================ -->
 
-                <div id='statusBox' style="z-index: 20; background-color: red;">
+
+<!--     <div id='statusBox' style="z-index: 20; background-color: red;">
 			Status: OK
-		</div>
+		</div>         -->
 			
-		<div id="graph_dialog" class="window_div" title="Please select a node for real-time spectrum sensing" style='margin-top:2px;padding:0px'>
+	<div id="graph_dialog" class="window_div" title="Please select a node for real-time spectrum sensing" style='margin-top:2px;padding:0px'>
 			<canvas id='cvs' style="z-index: 0;"></canvas>
  			<canvas id="layer2" style="z-index: 200; cursor:crosshair;"></canvas>
-		</div>
+		</div> 
+
+
+
 		<div id="metrics_dialog" class="window_div" title="Simulated Performance Metrics" style='margin-top:2px;padding:0px'>
 			<table class='table1' id='metrics_table'>
 				
 			</table>
-		</div>
+		</div>      
+
+
+
 		<div id="waterfall_dialog" class="window_div" title="Please select a node for real-time spectrum sensing" style='margin-top:2px;padding:0px'>
 			<div id="heatmapArea" style='width:100%;height:100%'></div>
 		</div>
+
+
+
 		<div id="help_dialog" class="window_div" title="Help">
 			<div class="section" id="camera-navigation">
 				<h1>Spectral Games</h1>
@@ -1574,16 +1596,16 @@
 <!-- ================================================================= -->
 <!--the following divs are used for the throughput graph -->
  <div id="container">  
-      <div id="containera">
+      <div id="containera" style="display:none">
           <div id="left" title="node_0"></div>
           <div id="right" title="node_1"></div>
       </div>
-      <div id="containerb">
+      <div id="containerb" style="display:none">
           <div id="leftb" title="node_2"></div>
           <div id="rightb" title="node_3"></div>
       </div>
  </div>
-<div id="Teams_container">
+<div id="Teams_container" style="display:none">
           <div id="leftt" title="team A"></div>
           <div id="rightt" title="team B"></div>
           <div id="leftb_team" title="teams A & B"></div>
